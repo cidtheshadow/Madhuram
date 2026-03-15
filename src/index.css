@@ -1,0 +1,239 @@
+@font-face {
+  font-family: 'Naluka';
+  src: url('/fonts/Naluka.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+:root {
+  --bg-color: #1a0f2e;
+  --bg-darker: #120921;
+  --bg-card: #281442;
+  --pink: #f700ff;
+  --yellow: #fcee0a;
+  --cyan: #00f0ff;
+  --text-main: #ffffff;
+  --text-muted: #af9ccf;
+
+  --font-heading: 'Montserrat', sans-serif;
+  --font-logo: 'Mystery Quest', system-ui;
+  --font-display: 'Mystery Quest', system-ui;
+  --font-sub: 'Montserrat', sans-serif;
+  --font-text: 'Montserrat', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-text);
+  background-color: var(--bg-color);
+  background-image: radial-gradient(circle at center top, #281442 0%, var(--bg-darker) 100%);
+  background-attachment: fixed;
+  color: var(--text-main);
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: var(--font-heading);
+  cursor: pointer;
+  border: none;
+  background: none;
+  outline: none;
+}
+
+/* Base Utility Classes */
+.text-pink {
+  color: var(--pink);
+}
+
+.text-yellow {
+  color: var(--yellow);
+}
+
+.text-cyan {
+  color: var(--cyan);
+}
+
+.bg-pink {
+  background-color: var(--pink);
+}
+
+.bg-yellow {
+  background-color: var(--yellow);
+}
+
+.bg-cyan {
+  background-color: var(--cyan);
+}
+
+/* Buttons */
+.btn-primary {
+  background-color: var(--pink);
+  color: white;
+  padding: 14px 36px;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  border-radius: 50px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(247, 0, 255, 0.4);
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 2px solid var(--pink);
+  color: white;
+  padding: 12px 34px;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  border-radius: 50px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.btn-outline:hover {
+  background-color: rgba(247, 0, 255, 0.1);
+}
+
+/* Page Container */
+.page-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-wrapper {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navigation Menu */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 5%;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(18, 9, 33, 0.8);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.nav-links {
+  display: flex;
+  gap: 32px;
+  list-style: none;
+}
+
+.nav-link {
+  font-family: var(--font-heading);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  transition: color 0.3s;
+}
+
+.nav-link.active,
+.nav-link:hover {
+  color: white;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--pink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-family: var(--font-logo);
+}
+
+/* Cards */
+.card {
+  background: rgba(40, 20, 66, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(247, 0, 255, 0.15);
+  border-radius: 32px;
+  padding: 24px;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.card:hover {
+  border-color: rgba(247, 0, 255, 0.6);
+  box-shadow: 0 15px 40px rgba(247, 0, 255, 0.2), 0 0 20px rgba(247, 0, 255, 0.1) inset;
+  transform: translateY(-6px) scale(1.02);
+}
+
+/* Background Pattern removed for central clean design */
+.bg-pattern {
+  display: none;
+}
+
+/* Text glow */
+.text-glow-pink {
+  text-shadow: 0 0 10px rgba(247, 0, 255, 0.6);
+}
+
+.text-glow-yellow {
+  text-shadow: 0 0 10px rgba(252, 238, 10, 0.6);
+}
+
+/* Image placeholder styling */
+.img-placeholder {
+  background: linear-gradient(45deg, #2a1142, #18092a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
