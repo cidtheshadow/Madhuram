@@ -6,6 +6,7 @@ import About from './pages/About';
 import Events from './pages/Events';
 import Sponsors from './pages/Sponsors';
 import Team from './pages/Team';
+import Register from './pages/Register';
 import LoadingPage from './pages/LoadingPage';
 import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -30,6 +31,7 @@ function AnimatedRoutes() {
         <Route path="/events" element={<Events />} />
         <Route path="/sponsors" element={<Sponsors />} />
         <Route path="/team" element={<Team />} />
+        <Route path="/register" element={<Register />} />
       </Routes>
     </AnimatePresence>
   );
@@ -87,15 +89,15 @@ function App() {
             const interval = 100;
             const steps = fadeInDuration / interval;
             const stepVolume = 60 / steps; // Max volume 60%
-            
+
             let currentStep = 0;
             const fadeInterval = setInterval(() => {
-                currentStep++;
-                if (currentStep <= steps) {
-                    event.target.setVolume(Math.round(currentStep * stepVolume));
-                } else {
-                    clearInterval(fadeInterval);
-                }
+              currentStep++;
+              if (currentStep <= steps) {
+                event.target.setVolume(Math.round(currentStep * stepVolume));
+              } else {
+                clearInterval(fadeInterval);
+              }
             }, interval);
           }
         }
@@ -115,7 +117,7 @@ function App() {
       {!interacted ? (
         <div
           onClick={() => {
-              setInteracted(true);
+            setInteracted(true);
           }}
           style={{
             height: '100vh', width: '100vw', background: 'var(--bg-darker)', display: 'flex',
