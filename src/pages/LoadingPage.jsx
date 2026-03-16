@@ -105,6 +105,111 @@ const AudioVisualizer = ({ isMuted }) => {
     );
 };
 
+const EventCountdown = () => {
+    const targetDate = new Date('2026-04-10T00:00:00+05:30').getTime();
+    const [timeLeft, setTimeLeft] = useState(targetDate - new Date().getTime());
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+            setTimeLeft(distance);
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [targetDate]);
+
+    // If countdown is finished
+    if (timeLeft <= 0) {
+        return (
+            <div style={{
+                textAlign: 'center',
+                zIndex: 10,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center'
+            }}>
+                <div style={{
+                    fontSize: '1rem',
+                    color: 'var(--cyan)',
+                    letterSpacing: '4px',
+                    fontWeight: 800,
+                    textShadow: '0 0 10px rgba(0,240,255,0.8)'
+                }}>
+                    AN EXPRESSION OF
+                </div>
+                <div style={{
+                    fontSize: '1.4rem',
+                    color: 'var(--pink)',
+                    letterSpacing: '5px',
+                    fontWeight: 900,
+                    marginTop: '8px',
+                    textShadow: '0 0 10px rgba(255,42,133,0.8)'
+                }}>
+                    EUPHORIA
+                </div>
+            </div>
+        );
+    }
+
+    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+    const pad = (num) => num.toString().padStart(2, '0');
+
+    return (
+        <div style={{
+            textAlign: 'center',
+            zIndex: 10,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontFamily: 'Montserrat, sans-serif'
+        }}>
+            <div style={{
+                color: 'var(--cyan)',
+                fontSize: '0.65rem',
+                letterSpacing: '3px',
+                marginBottom: '8px',
+                fontWeight: 700,
+                opacity: 0.8
+            }}>
+                INITIATING IN
+            </div>
+
+            <div style={{
+                display: 'flex',
+                gap: '8px',
+                alignItems: 'baseline'
+            }}>
+                <div className="time-block" style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '2rem', fontWeight: 900, color: '#fff', textShadow: '0 0 10px rgba(255,255,255,0.5)' }}>{pad(days)}</div>
+                    <div style={{ fontSize: '0.5rem', color: 'var(--pink)', letterSpacing: '2px', marginTop: '-4px' }}>DAYS</div>
+                </div>
+                <div style={{ fontSize: '1.5rem', color: 'var(--cyan)', fontWeight: 'bold', margin: '0 2px', textShadow: '0 0 10px var(--cyan)' }}>:</div>
+                <div className="time-block" style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '2rem', fontWeight: 900, color: '#fff', textShadow: '0 0 10px rgba(255,255,255,0.5)' }}>{pad(hours)}</div>
+                    <div style={{ fontSize: '0.5rem', color: 'var(--pink)', letterSpacing: '2px', marginTop: '-4px' }}>HRS</div>
+                </div>
+                <div style={{ fontSize: '1.5rem', color: 'var(--cyan)', fontWeight: 'bold', margin: '0 2px', textShadow: '0 0 10px var(--cyan)' }}>:</div>
+                <div className="time-block" style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '2rem', fontWeight: 900, color: '#fff', textShadow: '0 0 10px rgba(255,255,255,0.5)' }}>{pad(minutes)}</div>
+                    <div style={{ fontSize: '0.5rem', color: 'var(--pink)', letterSpacing: '2px', marginTop: '-4px' }}>MIN</div>
+                </div>
+                <div style={{ fontSize: '1.5rem', color: 'var(--cyan)', fontWeight: 'bold', margin: '0 2px', textShadow: '0 0 10px var(--cyan)' }}>:</div>
+                <div className="time-block" style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '2rem', fontWeight: 900, color: '#fff', textShadow: '0 0 10px rgba(255,255,255,0.5)' }}>{pad(seconds)}</div>
+                    <div style={{ fontSize: '0.5rem', color: 'var(--pink)', letterSpacing: '2px', marginTop: '-4px' }}>SEC</div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const LoadingPage = ({ onEnter, isMuted, onToggleMute }) => {
     const [ready, setReady] = useState(false);
     const [loadingText, setLoadingText] = useState('INITIALIZING MOOD_STREAM...');
@@ -211,6 +316,7 @@ const LoadingPage = ({ onEnter, isMuted, onToggleMute }) => {
                         border: '1px dashed rgba(139, 92, 246, 0.5)'
                     }}
                 />
+                <EventCountdown />
                 <AudioVisualizer isMuted={isMuted} />
             </motion.div>
 
