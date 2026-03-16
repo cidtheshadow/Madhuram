@@ -8,8 +8,9 @@ import Sponsors from './pages/Sponsors';
 import Team from './pages/Team';
 import Register from './pages/Register';
 import LoadingPage from './pages/LoadingPage';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Volume2, VolumeX } from 'lucide-react';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -37,12 +38,42 @@ function AnimatedRoutes() {
   );
 }
 
-function MainApp() {
+function MainApp({ isMuted, onToggleMute }) {
   return (
     <div className="page-container">
       <ScrollToTop />
       <div className="bg-pattern" />
       <Navbar />
+
+      {/* Global Mute Toggle */}
+      <motion.button
+        onClick={onToggleMute}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        style={{
+          position: 'fixed',
+          bottom: '30px',
+          right: '30px',
+          zIndex: 99999,
+          background: 'rgba(255,255,255,0.05)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          backdropFilter: 'blur(10px)',
+          padding: '12px',
+          borderRadius: '50%',
+          color: isMuted ? 'var(--text-muted)' : 'var(--cyan)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          transition: 'all 0.3s',
+          boxShadow: isMuted ? 'none' : '0 0 15px rgba(0,240,255,0.3)',
+        }}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+      >
+        {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
+      </motion.button>
+
       <div className="content-wrapper">
         <AnimatedRoutes />
       </div>
@@ -54,6 +85,8 @@ function MainApp() {
 function App() {
   const [interacted, setInteracted] = useState(false);
   const [entered, setEntered] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const playerRef = useRef(null);
 
   useEffect(() => {
     if (!interacted) return;
@@ -66,51 +99,62 @@ function App() {
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     }
 
-    let player;
     window.onYouTubeIframeAPIReady = () => {
-      player = new window.YT.Player('bg-youtube-audio', {
-        videoId: 'V3cN7MX2qnI', // User specified background track
+      playerRef.current = new window.YT.Player('bg-youtube-audio', {
+        videoId: 'h7MYJghRWt0', // Die For You - VALORANT
         playerVars: {
           autoplay: 1,
           loop: 1,
-          playlist: 'V3cN7MX2qnI',
+          playlist: 'h7MYJghRWt0',
           controls: 0,
           showinfo: 0,
           autohide: 1,
-          start: 38
+          start: 0 // Play from beginning
         },
         events: {
           onReady: (event) => {
             event.target.setVolume(0);
             event.target.playVideo();
 
-            // Custom fade-in logic
-            const fadeInDuration = 3000;
-            const interval = 100;
-            const steps = fadeInDuration / interval;
-            const stepVolume = 60 / steps; // Max volume 60%
+            if (!isMuted) {
+              // Custom fade-in logic
+              const fadeInDuration = 3000;
+              const interval = 100;
+              const steps = fadeInDuration / interval;
+              const stepVolume = 60 / steps; // Max volume 60%
 
-            let currentStep = 0;
-            const fadeInterval = setInterval(() => {
-              currentStep++;
-              if (currentStep <= steps) {
-                event.target.setVolume(Math.round(currentStep * stepVolume));
-              } else {
-                clearInterval(fadeInterval);
-              }
-            }, interval);
+              let currentStep = 0;
+              const fadeInterval = setInterval(() => {
+                currentStep++;
+                if (currentStep <= steps) {
+                  event.target.setVolume(Math.round(currentStep * stepVolume));
+                } else {
+                  clearInterval(fadeInterval);
+                }
+              }, interval);
+            }
           }
         }
       });
     };
 
     return () => {
-      if (player && typeof player.destroy === 'function') {
-        player.destroy();
+      if (playerRef.current && typeof playerRef.current.destroy === 'function') {
+        playerRef.current.destroy();
       }
       window.onYouTubeIframeAPIReady = null;
     };
   }, [interacted]);
+
+  useEffect(() => {
+    if (playerRef.current && typeof playerRef.current.setVolume === 'function') {
+      if (isMuted) {
+        playerRef.current.setVolume(0);
+      } else {
+        playerRef.current.setVolume(60);
+      }
+    }
+  }, [isMuted]);
 
   return (
     <Router>
@@ -136,9 +180,13 @@ function App() {
         <>
           <div id="bg-youtube-audio" style={{ display: 'none', position: 'absolute', width: 0, height: 0 }} />
           {!entered ? (
-            <LoadingPage onEnter={() => setEntered(true)} />
+            <LoadingPage
+              onEnter={() => setEntered(true)}
+              isMuted={isMuted}
+              onToggleMute={() => setIsMuted(!isMuted)}
+            />
           ) : (
-            <MainApp />
+            <MainApp isMuted={isMuted} onToggleMute={() => setIsMuted(!isMuted)} />
           )}
         </>
       )}

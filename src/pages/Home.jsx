@@ -328,6 +328,40 @@ const Home = () => {
                 </div>
             </motion.section>
 
+            {/* TRAILER SECTION */}
+            <motion.section
+                variants={scrollReveal}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-100px" }}
+                style={{ padding: '80px 10vw', textAlign: 'center' }}
+            >
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px', marginBottom: '40px' }}>
+                    <div style={{ background: '#00f0ff', color: '#000', padding: '8px 20px', fontSize: '2rem', fontWeight: 900, fontFamily: 'Montserrat, sans-serif' }}>OFFICIAL</div>
+                    <div style={{ background: '#f700ff', color: '#fff', padding: '8px 20px', fontSize: '2rem', fontWeight: 900, fontFamily: 'Montserrat, sans-serif' }}>TRAILER</div>
+                </div>
+
+                <div style={{
+                    position: 'relative',
+                    paddingBottom: '56.25%',
+                    height: 0,
+                    overflow: 'hidden',
+                    maxWidth: '100%',
+                    borderRadius: '16px',
+                    border: '4px solid rgba(0, 240, 255, 0.3)',
+                    boxShadow: '0 0 40px rgba(0, 240, 255, 0.2)'
+                }}>
+                    <iframe
+                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                        src="https://www.youtube.com/embed/V3cN7MX2qnI"
+                        title="Madhuram 2026 Trailer"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                    ></iframe>
+                </div>
+            </motion.section>
+
             {/* FAQ SECTION */}
             <motion.section
                 variants={scrollReveal}

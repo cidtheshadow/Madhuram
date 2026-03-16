@@ -1,7 +1,111 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { Volume2, VolumeX } from 'lucide-react';
 
-const LoadingPage = ({ onEnter }) => {
+const AudioVisualizer = ({ isMuted }) => {
+    const canvasRef = useRef(null);
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const size = 360; // Larger than container to let bars go outside
+        canvas.width = size;
+        canvas.height = size;
+
+        const cx = size / 2;
+        const cy = size / 2;
+        const radius = 100; // Matches inner circle size roughly
+        const barsCount = 120;
+        const bpm = 142; // Die For You BPM
+        const beatInterval = 60000 / bpm;
+
+        // Generate pseudo-random phases for each bar
+        const barPhases = Array.from({ length: barsCount }).map(() => Math.random() * Math.PI * 2);
+
+        let animationId;
+        const render = () => {
+            ctx.clearRect(0, 0, size, size);
+
+            const now = Date.now();
+            const beatPhase = (now % beatInterval) / beatInterval;
+            const kick = Math.pow(1 - beatPhase, 4); // sharp kick decay
+
+            for (let i = 0; i < barsCount; i++) {
+                const angle = (i / barsCount) * Math.PI * 2 - Math.PI / 2;
+
+                // Color mapping: Top is Cyan, Bottom is Deep Blue/Purple
+                const yFactor = Math.sin(angle);
+                const normalizedY = (yFactor + 1) / 2; // 0 at top, 1 at bottom
+
+                let h = 3;
+                if (!isMuted) {
+                    // Combine sine waves to create complex, flowing motion
+                    const wave1 = Math.sin(i * 0.2 + now * 0.002 + barPhases[i]);
+                    const wave2 = Math.sin(i * 0.8 - now * 0.005);
+                    const wave3 = Math.cos(i * 0.05 + now * 0.001);
+
+                    // Bass emphasis at the bottom half and left/right edges
+                    const bassZone = (normalizedY > 0.6 || Math.abs(Math.cos(angle)) > 0.8) ? 1.5 : 0.5;
+
+                    const reactivity = Math.max(0, wave1 + wave2 * 0.5 + wave3) * 15;
+                    h = 4 + reactivity + (kick * 30 * bassZone * Math.max(0, wave1));
+                }
+
+                // Interpolate colors: Top: Cyan (#00f0ff), Bottom: Indigo/Purple (#6366f1)
+                const r = Math.floor(0 + (99 - 0) * normalizedY);
+                const g = Math.floor(240 + (102 - 240) * normalizedY);
+                const b = Math.floor(255 + (241 - 255) * normalizedY);
+                const color = `rgb(${r},${g},${b})`;
+
+                // Bar geometry
+                const cX1 = cx + Math.cos(angle) * (radius + 2);
+                const cY1 = cy + Math.sin(angle) * (radius + 2);
+                const cX2 = cx + Math.cos(angle) * (radius + 2 + h);
+                const cY2 = cy + Math.sin(angle) * (radius + 2 + h);
+
+                // Draw Bar
+                ctx.beginPath();
+                ctx.moveTo(cX1, cY1);
+                ctx.lineTo(cX2, cY2);
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = color;
+                ctx.lineCap = 'round';
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = color;
+                ctx.stroke();
+
+                // Draw Inner Dot (to mimic reference image)
+                const dX = cx + Math.cos(angle) * (radius - 12);
+                const dY = cy + Math.sin(angle) * (radius - 12);
+                ctx.beginPath();
+                ctx.arc(dX, dY, 2, 0, Math.PI * 2);
+                ctx.fillStyle = color;
+                ctx.shadowBlur = 8;
+                ctx.fill();
+            }
+
+            animationId = requestAnimationFrame(render);
+        };
+        render();
+        return () => cancelAnimationFrame(animationId);
+    }, [isMuted]);
+
+    return (
+        <canvas
+            ref={canvasRef}
+            style={{
+                position: 'absolute',
+                width: '360px',
+                height: '360px',
+                pointerEvents: 'none',
+                filter: 'drop-shadow(0px 0px 10px rgba(0,240,255,0.4))'
+            }}
+        />
+    );
+};
+
+const LoadingPage = ({ onEnter, isMuted, onToggleMute }) => {
     const [ready, setReady] = useState(false);
     const [loadingText, setLoadingText] = useState('INITIALIZING MOOD_STREAM...');
 
@@ -46,49 +150,68 @@ const LoadingPage = ({ onEnter }) => {
             zIndex: 9999,
             fontFamily: 'var(--font-heading)',
         }}>
-            {/* Central Circle with Pulse and Waveform */}
+
+            {/* Audio Controls */}
+            <motion.button
+                onClick={onToggleMute}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                style={{
+                    position: 'absolute',
+                    top: '40px',
+                    right: '40px',
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    backdropFilter: 'blur(10px)',
+                    padding: '12px',
+                    borderRadius: '50%',
+                    color: isMuted ? 'var(--text-muted)' : 'var(--cyan)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s',
+                    boxShadow: isMuted ? 'none' : '0 0 15px rgba(0,240,255,0.3)',
+                }}
+            >
+                {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
+            </motion.button>
+
+            {/* Central Circle with Pulse and Visualizer */}
             <motion.div
                 animate={{
-                    scale: [1, 1.05, 1],
-                    boxShadow: [
-                        '0 0 10px rgba(255, 42, 133, 0.2)',
-                        '0 0 40px rgba(0, 240, 255, 0.4)',
-                        '0 0 10px rgba(255, 42, 133, 0.2)'
+                    scale: isMuted ? 1 : [1, 1.02, 1],
+                    boxShadow: isMuted ? 'inset 0 0 20px rgba(0,0,0,0.5)' : [
+                        'inset 0 0 20px rgba(0, 240, 255, 0.2)',
+                        'inset 0 0 50px rgba(0, 240, 255, 0.4)',
+                        'inset 0 0 20px rgba(0, 240, 255, 0.2)'
                     ]
                 }}
                 transition={{ duration: 0.49, repeat: Infinity, ease: "easeInOut" }}
                 style={{
-                    width: '220px',
-                    height: '220px',
+                    width: '240px',
+                    height: '240px',
                     borderRadius: '50%',
-                    border: '1px solid rgba(255, 255, 255, 0.05)',
-                    background: 'radial-gradient(circle at center, rgba(0, 240, 255, 0.05) 0%, rgba(255, 42, 133, 0.1) 100%)',
+                    border: '2px solid rgba(0, 240, 255, 0.4)',
+                    background: 'rgba(0, 0, 0, 0.6)',
                     position: 'relative',
-                    marginBottom: '60px',
+                    marginBottom: '80px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
                 }}
             >
-                {/* Beating Heart / ECG Waveform */}
-                <div style={{ width: '120px', height: '40px', overflow: 'hidden', position: 'relative' }}>
-                    <motion.svg 
-                        viewBox="0 0 200 100" 
-                        preserveAspectRatio="none"
-                        style={{ width: '200%', height: '100%', position: 'absolute', left: 0 }}
-                        animate={{ x: ['0%', '-50%'] }}
-                        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                    >
-                        <path 
-                            d="M 0 50 L 20 50 L 30 20 L 40 80 L 50 50 L 100 50 L 120 50 L 130 20 L 140 80 L 150 50 L 200 50" 
-                            fill="transparent" 
-                            stroke="var(--pink)" 
-                            strokeWidth="4" 
-                            strokeLinejoin="round"
-                            style={{ filter: 'drop-shadow(0 0 8px rgba(255,42,133,0.8))' }}
-                        />
-                    </motion.svg>
-                </div>
+                <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                    style={{
+                        position: 'absolute',
+                        inset: 8,
+                        borderRadius: '50%',
+                        border: '1px dashed rgba(139, 92, 246, 0.5)'
+                    }}
+                />
+                <AudioVisualizer isMuted={isMuted} />
             </motion.div>
 
             {/* Title block */}
@@ -134,7 +257,7 @@ const LoadingPage = ({ onEnter }) => {
                             {loadingText}
                         </motion.div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: 'var(--pink)', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '1px' }}>
-                            <span>SYSTEM STATUS <span style={{ color: '#fff', marginLeft: '6px' }}>Syncing Neon Pulse</span></span>
+                            <span>SYSTEM STATUS <span style={{ color: '#fff', marginLeft: '6px' }}>Syncing Audio Matrix</span></span>
                             <span style={{ color: 'var(--cyan)', fontSize: '1rem', fontWeight: 800 }}>100%</span>
                         </div>
                         <div style={{ height: '4px', background: '#331a52', borderRadius: '4px', overflow: 'hidden' }}>
@@ -181,8 +304,8 @@ const LoadingPage = ({ onEnter }) => {
                 )}
             </AnimatePresence>
 
-            <div style={{ position: 'absolute', bottom: '40px', left: '40px', color: 'var(--pink)', fontSize: '0.7rem', letterSpacing: '2px' }}>
-                ERROR_CODE: 0XVAPORWAVE
+            <div style={{ position: 'absolute', bottom: '40px', left: '40px', color: 'var(--cyan)', fontSize: '0.8rem', letterSpacing: '2px', fontWeight: 'bold' }}>
+                TRACK: DIE FOR YOU (VALORANT)
             </div>
             <div style={{ position: 'absolute', bottom: '40px', right: '40px', color: 'var(--text-muted)', fontSize: '0.7rem', letterSpacing: '2px' }}>
                 © 2026 RETRO_FUTURE_LABS
