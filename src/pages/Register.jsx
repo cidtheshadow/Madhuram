@@ -7,6 +7,7 @@ import { supabase } from '../lib/supabase';
 const RegistrationForm = ({ isSliet, onBack, initialEvent }) => {
     const [formData, setFormData] = useState({
         name: '',
+        whatsapp_no: '',
         reg_no: '',
         trade: '',
         college_name: isSliet ? 'SLIET' : '',
@@ -34,17 +35,28 @@ const RegistrationForm = ({ isSliet, onBack, initialEvent }) => {
         setStatus('submitting');
         setErrorMessage('');
 
+        // Basic validation
+        if (formData.whatsapp_no.length < 10) {
+            setStatus('error');
+            setErrorMessage('Please enter a valid 10-digit WhatsApp number.');
+            return;
+        }
+
         try {
             const table = isSliet ? 'sliet_registrations' : 'non_sliet_registrations';
-            const payload = isSliet ? {
-                name: formData.name, reg_no: formData.reg_no, trade: formData.trade,
-                event_name: formData.event_name, performance_type: formData.performance_type,
+            const payload = {
+                name: formData.name,
+                whatsapp_no: formData.whatsapp_no,
+                reg_no: formData.reg_no,
+                trade: formData.trade,
+                college_name: formData.college_name,
+                event_name: formData.event_name,
+                performance_type: formData.performance_type,
                 performance_details: formData.performance_details,
-            } : {
-                name: formData.name, college_name: formData.college_name, reg_no: formData.reg_no,
-                trade: formData.trade, event_name: formData.event_name,
-                performance_type: formData.performance_type, performance_details: formData.performance_details,
-                accommodation: formData.accommodation, payment_paid: formData.payment_paid,
+                ...(isSliet ? {} : {
+                    accommodation: formData.accommodation,
+                    payment_paid: formData.payment_paid
+                })
             };
 
             const { error } = await supabase.from(table).insert([payload]);
@@ -52,14 +64,19 @@ const RegistrationForm = ({ isSliet, onBack, initialEvent }) => {
 
             setStatus('success');
             setFormData({
-                name: '', reg_no: '', trade: '', college_name: isSliet ? 'SLIET' : '',
+                name: '', whatsapp_no: '', reg_no: '', trade: '', college_name: isSliet ? 'SLIET' : '',
                 event_name: '', performance_type: '', performance_details: '',
                 accommodation: false, payment_paid: false
             });
-            setTimeout(() => setStatus('idle'), 5000);
+            // We don't clear idle automatically so they can see the WhatsApp link
         } catch (err) {
+            console.error('Registration Error:', err);
             setStatus('error');
-            setErrorMessage(err.message || 'An error occurred during registration.');
+            if (err.message === 'Failed to fetch' || !import.meta.env.VITE_SUPABASE_URL) {
+                setErrorMessage('Connection failed. Please ensure environment variables are configured in Vercel.');
+            } else {
+                setErrorMessage(err.message || 'An error occurred during registration.');
+            }
         }
     };
 
@@ -105,28 +122,48 @@ const RegistrationForm = ({ isSliet, onBack, initialEvent }) => {
                 <div style={{ textAlign: 'center', padding: '40px 0' }}>
                     <CheckCircle2 color="#4ade80" size={60} style={{ margin: '0 auto 20px' }} />
                     <h2 style={{ color: '#fff', marginBottom: '10px' }}>Registration Successful!</h2>
-                    <p style={{ color: 'var(--text-muted)' }}>We look forward to seeing you at Madhuram.</p>
+                    <p style={{ color: 'var(--text-muted)', marginBottom: '30px' }}>We look forward to seeing you at Madhuram.</p>
+
+                    <div style={{ background: 'rgba(37, 211, 102, 0.1)', padding: '24px', borderRadius: '16px', border: '1px solid rgba(37, 211, 102, 0.3)' }}>
+                        <p style={{ color: '#fff', fontWeight: 'bold', marginBottom: '16px' }}>Stay Updated!</p>
+                        <a
+                            href="https://chat.whatsapp.com/YOUR_GROUP_LINK"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn-primary"
+                            style={{ background: '#25D366', color: '#fff', border: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                        >
+                            JOIN WHATSAPP GROUP
+                        </a>
+                    </div>
+                    <button onClick={() => setStatus('idle')} style={{ marginTop: '30px', background: 'none', border: 'none', color: 'var(--cyan)', cursor: 'pointer', textDecoration: 'underline' }}>
+                        Register Another Participant
+                    </button>
                 </div>
             ) : (
                 <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '24px' }}>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px' }}>
                         <div>
                             <label style={labelStyle}>Full Name</label>
-                            <input required type="text" name="name" value={formData.name} onChange={handleChange} style={inputStyle} placeholder="Participant Name" />
+                            <input required type="text" minLength="3" maxLength="50" name="name" value={formData.name} onChange={handleChange} style={inputStyle} placeholder="Participant Name" />
                         </div>
                         {!isSliet && (
                             <div>
                                 <label style={labelStyle}>College/University</label>
-                                <input required type="text" name="college_name" value={formData.college_name} onChange={handleChange} style={inputStyle} placeholder="Your College Name" />
+                                <input required type="text" minLength="3" maxLength="100" name="college_name" value={formData.college_name} onChange={handleChange} style={inputStyle} placeholder="Your College Name" />
                             </div>
                         )}
                         <div>
+                            <label style={labelStyle}>WhatsApp Number</label>
+                            <input required type="tel" pattern="[0-9]{10}" minLength="10" maxLength="10" name="whatsapp_no" value={formData.whatsapp_no} onChange={handleChange} style={inputStyle} placeholder="10-digit number" />
+                        </div>
+                        <div>
                             <label style={labelStyle}>Registration / Roll No</label>
-                            <input required type="text" name="reg_no" value={formData.reg_no} onChange={handleChange} style={inputStyle} placeholder="Registration Number" />
+                            <input required type="text" minLength="4" maxLength="20" name="reg_no" value={formData.reg_no} onChange={handleChange} style={inputStyle} placeholder="Registration Number" />
                         </div>
                         <div>
                             <label style={labelStyle}>Trade / Course</label>
-                            <input required type="text" name="trade" value={formData.trade} onChange={handleChange} style={inputStyle} placeholder="e.g., Computer Science" />
+                            <input required type="text" minLength="2" maxLength="50" name="trade" value={formData.trade} onChange={handleChange} style={inputStyle} placeholder="e.g., Computer Science" />
                         </div>
                         <div>
                             <label style={labelStyle}>Event</label>

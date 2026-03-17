@@ -24,10 +24,10 @@ const Home = () => {
     };
 
     const gallery = [
-        { title: 'Devine Divas Modelling', subtitle: 'Wall of Fame', img: '/wall-of-fame/Devine Divas.jpeg', color: '#00f0ff' },
-        { title: 'Khasa Ala Chahar', subtitle: 'Wall of Fame', img: '/wall-of-fame/Khasa Ala.jpeg', color: '#ebff00' },
-        { title: 'Walk it Modelling', subtitle: 'Wall of Fame', img: '/wall-of-fame/Modelling.jpeg', color: '#ebff00' },
-        { title: 'The Glory', subtitle: 'Wall of Fame', img: '/wall-of-fame/WhatsApp Image 2026-03-14 at 11.34.22.jpeg', color: '#00f0ff' }
+        { title: 'Devine Divas Modelling', subtitle: 'Wall of Fame', img: 'https://i.ibb.co/3ykXWjG5/Modelling-Divas.jpg', color: '#00f0ff' },
+        { title: 'Khasa Ala Chahar', subtitle: 'Wall of Fame', img: 'https://i.ibb.co/4gnnCgN/Khasa-Ala.jpg', color: '#ebff00' },
+        { title: 'Walk it Modelling', subtitle: 'Wall of Fame', img: 'https://i.ibb.co/C3X1H7p/Modelling-Walk.jpg', color: '#ebff00' },
+        { title: 'The Glory', subtitle: 'Wall of Fame', img: 'https://i.ibb.co/d0hB09Cc/The-Glory.jpg', color: '#00f0ff' }
     ];
 
     const faqs = [
@@ -353,7 +353,7 @@ const Home = () => {
                 }}>
                     <iframe
                         style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                        src="https://www.youtube.com/embed/V3cN7MX2qnI"
+                        src="https://www.youtube.com/embed/TntPd_3u-Xg"
                         title="Madhuram 2026 Trailer"
                         frameBorder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
