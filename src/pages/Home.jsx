@@ -12,8 +12,15 @@ const Home = () => {
     const navigate = useNavigate();
     const [openFaq, setOpenFaq] = useState(null);
     const canvasRef = useRef(null);
+    const heroRef = useRef(null);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
-    // High performance UI reveal without heavy CSS blurs
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 1024);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     const scrollReveal = {
         hidden: { opacity: 0, y: 40 },
         visible: {
@@ -24,10 +31,10 @@ const Home = () => {
     };
 
     const gallery = [
-        { title: 'Devine Divas Modelling', subtitle: 'Wall of Fame', img: 'https://i.ibb.co/3ykXWjG5/Modelling-Divas.jpg', color: '#00f0ff' },
-        { title: 'Khasa Ala Chahar', subtitle: 'Wall of Fame', img: 'https://i.ibb.co/4gnnCgN/Khasa-Ala.jpg', color: '#ebff00' },
-        { title: 'Walk it Modelling', subtitle: 'Wall of Fame', img: 'https://i.ibb.co/C3X1H7p/Modelling-Walk.jpg', color: '#ebff00' },
-        { title: 'The Glory', subtitle: 'Wall of Fame', img: 'https://i.ibb.co/d0hB09Cc/The-Glory.jpg', color: '#00f0ff' }
+        { title: 'Devine Divas', subtitle: 'Wall of Fame', img: '/wall-of-fame/Devine Divas.jpeg', color: '#f700ff' },
+        { title: 'Khasa Ala Chahar', subtitle: 'Wall of Fame', img: '/wall-of-fame/Khasa Ala.jpeg', color: '#ebff00' },
+        { title: 'Modelling', subtitle: 'Wall of Fame', img: '/wall-of-fame/Modelling.jpeg', color: '#00f0ff' },
+        { title: 'Highlights', subtitle: 'Wall of Fame', img: '/wall-of-fame/WhatsApp Image 2026-03-14 at 11.34.22.jpeg', color: '#f700ff' },
     ];
 
     const faqs = [
@@ -39,27 +46,27 @@ const Home = () => {
         { q: "How can I contact the Madhuram team?", a: "You can reach out via email at madhuram@sliet.ac.in or check our Instagram @madhuramsliet." }
     ];
 
-    // Smooth Canvas Geometric Particle Constellation Effect
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
-
         const ctx = canvas.getContext('2d');
         let width = window.innerWidth;
         let height = window.innerHeight;
         canvas.width = width;
         canvas.height = height;
 
-        const handleResize = () => {
-            width = window.innerWidth;
-            height = window.innerHeight;
-            canvas.width = width;
-            canvas.height = height;
+        const resizeCanvas = () => {
+            const currentCanvas = canvasRef.current;
+            if (!currentCanvas) return;
+            currentCanvas.width = window.innerWidth;
+            currentCanvas.height = window.innerHeight;
+            // Drawers and render will use currentCanvas.width directly
         };
-        window.addEventListener('resize', handleResize);
+        window.addEventListener('resize', resizeCanvas);
 
-        const numParticles = Math.min(Math.floor(width / 40), 40); // responsive density
+        const numParticles = Math.min(Math.floor(width / 50), 30);
         const particles = [];
+        const tapFlowers = []; // interactive spawned flowers
         const colors = ['#D1FF00', '#f700ff', '#00f0ff', '#FF0055'];
 
         for (let i = 0; i < numParticles; i++) {
@@ -74,7 +81,9 @@ const Home = () => {
             });
         }
 
-        const drawStarburst = (x, y, r, c) => {
+        const drawStarburst = (x, y, r, c, alpha = 1) => {
+            ctx.save();
+            ctx.globalAlpha = alpha;
             ctx.strokeStyle = c; ctx.lineWidth = 1.5; ctx.beginPath();
             for (let i = 0; i < 8; i++) {
                 const a = (Math.PI / 4) * i;
@@ -82,9 +91,12 @@ const Home = () => {
             }
             ctx.stroke();
             ctx.beginPath(); ctx.arc(x, y, r * 0.3, 0, Math.PI * 2); ctx.stroke();
+            ctx.restore();
         };
 
-        const drawFlower = (x, y, r, c) => {
+        const drawFlower = (x, y, r, c, alpha = 1) => {
+            ctx.save();
+            ctx.globalAlpha = alpha;
             ctx.fillStyle = 'transparent'; ctx.strokeStyle = c; ctx.lineWidth = 1.5; ctx.beginPath();
             for (let i = 0; i < 6; i++) {
                 const a = (Math.PI / 3) * i;
@@ -92,114 +104,223 @@ const Home = () => {
                 ctx.ellipse(x + Math.cos(a) * r * 0.6, y + Math.sin(a) * r * 0.6, r * 0.6, r * 0.2, a, 0, Math.PI * 2);
             }
             ctx.stroke();
+            // glowing dot in center
+            ctx.beginPath(); ctx.arc(x, y, r * 0.18, 0, Math.PI * 2);
+            ctx.fillStyle = c; ctx.fill();
+            ctx.restore();
         };
 
-        const drawDiamondCircle = (x, y, r, c) => {
+        const drawDiamondCircle = (x, y, r, c, alpha = 1) => {
+            ctx.save();
+            ctx.globalAlpha = alpha;
             ctx.strokeStyle = c; ctx.lineWidth = 1.5;
             ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.stroke();
             const d = r * 0.6;
             ctx.beginPath(); ctx.moveTo(x, y - d); ctx.lineTo(x + d, y); ctx.lineTo(x, y + d); ctx.lineTo(x - d, y); ctx.closePath(); ctx.stroke();
             ctx.beginPath(); ctx.arc(x, y, r * 0.1, 0, Math.PI * 2); ctx.stroke();
+            ctx.restore();
         };
 
-        const drawEye = (x, y, r, c) => {
+        const drawEye = (x, y, r, c, alpha = 1) => {
+            ctx.save();
+            ctx.globalAlpha = alpha;
             ctx.strokeStyle = c; ctx.lineWidth = 1.5; ctx.beginPath();
             ctx.moveTo(x - r, y);
             ctx.quadraticCurveTo(x, y - r * 1.2, x + r, y);
             ctx.quadraticCurveTo(x, y + r * 1.2, x - r, y);
             ctx.stroke();
             ctx.fillStyle = '#D1FF00'; ctx.beginPath(); ctx.arc(x, y, r * 0.2, 0, Math.PI * 2); ctx.fill();
+            ctx.restore();
         };
+
+        const DRAWERS = [drawStarburst, drawFlower, drawDiamondCircle, drawEye];
+        const ripples = []; // expanding rings on spawn
+
+        // Spawn a flower + burst ripple at click/touch position
+        const spawnFlower = (x, y) => {
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            tapFlowers.push({
+                x, y,
+                radius: 18 + Math.random() * 14,
+                color,
+                type: Math.floor(Math.random() * 4),
+                born: performance.now(),
+                life: 2800,
+            });
+            // spawn 3 offset ripple rings
+            for (let k = 0; k < 3; k++) {
+                ripples.push({ x, y, color, born: performance.now() + k * 80, life: 700, maxR: 55 + k * 20 });
+            }
+        };
+
+        const hero = heroRef.current;
+        if (!hero) return;
+
+        const onPointerDown = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const touches = e.touches || [e];
+            Array.from(touches).forEach(t => {
+                spawnFlower(t.clientX - rect.left, t.clientY - rect.top);
+            });
+        };
+
+        hero.addEventListener('mousedown', onPointerDown);
+        hero.addEventListener('touchstart', onPointerDown, { passive: true });
 
         let animationId;
         const render = () => {
             ctx.clearRect(0, 0, width, height);
+            const now = performance.now();
 
-            // Movement
+            // ── ambient particles ──
             particles.forEach(p => {
-                p.x += p.vx;
-                p.y += p.vy;
+                p.x += p.vx; p.y += p.vy;
                 if (p.x < -p.radius) p.x = width + p.radius;
                 if (p.x > width + p.radius) p.x = -p.radius;
                 if (p.y < -p.radius) p.y = height + p.radius;
                 if (p.y > height + p.radius) p.y = -p.radius;
-
-                // Draw nodes
-                if (p.type === 0) drawStarburst(p.x, p.y, p.radius, p.color);
-                else if (p.type === 1) drawFlower(p.x, p.y, p.radius, p.color);
-                else if (p.type === 2) drawDiamondCircle(p.x, p.y, p.radius, p.color);
-                else drawEye(p.x, p.y, p.radius, p.color);
+                DRAWERS[p.type](p.x, p.y, p.radius, p.color, 1);
             });
 
-            // Constellation Lines
+            // ── ambient connection lines ──
             ctx.lineWidth = 1;
             for (let i = 0; i < numParticles; i++) {
                 for (let j = i + 1; j < numParticles; j++) {
-                    const p1 = particles[i];
-                    const p2 = particles[j];
-                    const dx = p1.x - p2.x;
-                    const dy = p1.y - p2.y;
+                    const p1 = particles[i], p2 = particles[j];
+                    const dx = p1.x - p2.x, dy = p1.y - p2.y;
                     const dist = Math.sqrt(dx * dx + dy * dy);
                     if (dist < 220) {
+                        ctx.save();
                         ctx.strokeStyle = p1.color;
-                        ctx.globalAlpha = 1 - (dist / 220); // fade out naturally
+                        ctx.globalAlpha = 1 - dist / 220;
                         ctx.beginPath();
                         ctx.moveTo(p1.x, p1.y);
-                        // Curved lines for an organic connection feel
                         ctx.quadraticCurveTo(p1.x + dx * 0.1, p1.y - dy * 0.1, p2.x, p2.y);
                         ctx.stroke();
+                        ctx.restore();
                     }
                 }
             }
-            ctx.globalAlpha = 1;
+
+            // ── tap flowers ──
+            for (let i = tapFlowers.length - 1; i >= 0; i--) {
+                const f = tapFlowers[i];
+                const age = now - f.born;
+                if (age > f.life) { tapFlowers.splice(i, 1); continue; }
+
+                // fade: full for first 40%, then fade out
+                const t = age / f.life;
+                const alpha = t < 0.4 ? 1 : 1 - (t - 0.4) / 0.6;
+
+                // draw the flower slightly larger
+                DRAWERS[f.type](f.x, f.y, f.radius * (1 + t * 0.4), f.color, alpha);
+
+                // connection lines to nearby ambient particles
+                particles.forEach(p => {
+                    const dx = f.x - p.x, dy = f.y - p.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 320) {
+                        ctx.save();
+                        ctx.strokeStyle = f.color;
+                        ctx.lineWidth = 1.2;
+                        ctx.globalAlpha = alpha * (1 - dist / 320) * 0.9;
+                        ctx.beginPath();
+                        ctx.moveTo(f.x, f.y);
+                        ctx.lineTo(p.x, p.y);
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                });
+
+                // connection lines to other tap flowers
+                tapFlowers.forEach((f2, j) => {
+                    if (j >= i) return;
+                    const dx = f.x - f2.x, dy = f.y - f2.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 400) {
+                        ctx.save();
+                        ctx.strokeStyle = f.color;
+                        ctx.lineWidth = 1;
+                        ctx.globalAlpha = alpha * (1 - dist / 400) * 0.7;
+                        ctx.setLineDash([4, 4]);
+                        ctx.beginPath();
+                        ctx.moveTo(f.x, f.y); ctx.lineTo(f2.x, f2.y);
+                        ctx.stroke();
+                        ctx.setLineDash([]);
+                        ctx.restore();
+                    }
+                });
+            }
+
+            // ── ripple burst rings ──
+            for (let i = ripples.length - 1; i >= 0; i--) {
+                const rip = ripples[i];
+                const age = now - rip.born;
+                if (age < 0) continue; // staggered start
+                if (age > rip.life) { ripples.splice(i, 1); continue; }
+                const t = age / rip.life;
+                const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
+                const r = eased * rip.maxR;
+                const alpha = (1 - t) * 0.75;
+                ctx.save();
+                ctx.globalAlpha = alpha;
+                ctx.strokeStyle = rip.color;
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(rip.x, rip.y, r, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+            }
 
             animationId = requestAnimationFrame(render);
         };
         render();
 
         return () => {
-            window.removeEventListener('resize', handleResize);
+            window.removeEventListener('resize', resizeCanvas);
+            hero.removeEventListener('mousedown', onPointerDown);
+            hero.removeEventListener('touchstart', onPointerDown);
             cancelAnimationFrame(animationId);
         };
     }, []);
 
     return (
-        // Unified full-page background color - cleanly removes borders between sections
         <div style={{ backgroundColor: '#2a0c24', minHeight: '100vh', color: '#fff', overflowX: 'hidden', fontFamily: 'Montserrat, sans-serif' }}>
 
-            {/* HERO SECTION WITH CANVAS PARTICLES */}
+            {/* HERO SECTION */}
             <section
+                ref={heroRef}
                 style={{
                     position: 'relative',
-                    height: '100vh',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    padding: '0 10vw',
+                    marginTop: isMobile ? '-60px' : '-68px',
+                    height: isMobile ? 'calc(100vh + 60px)' : 'calc(100vh + 68px)',
+                    display: 'flex', flexDirection: 'column', justifyContent: 'center',
+                    padding: isMobile ? '0 5vw' : '0 10vw',
+                    paddingTop: isMobile ? '60px' : '68px',
                     backgroundImage: `linear-gradient(rgba(42, 12, 36, 0.4), rgba(42, 12, 36, 0.7)), url("${heroBg}")`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    cursor: 'crosshair',
                 }}
             >
-                {/* Canvas covers the hero background cleanly */}
                 <canvas ref={canvasRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 1 }} />
 
-                <div style={{ position: 'relative', zIndex: 2 }}>
+                <div style={{ position: 'relative', zIndex: 2, textAlign: isMobile ? 'center' : 'left' }}>
                     <motion.h2
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1, delay: 0.2 }}
-                        style={{ color: '#ebff00', fontSize: 'clamp(1.2rem, 3vw, 2.5rem)', margin: 0, fontFamily: 'Montserrat, sans-serif', fontWeight: 800, textTransform: 'uppercase' }}
+                        style={{ color: '#ebff00', fontSize: isMobile ? '1.2rem' : 'clamp(1.2rem, 3vw, 2.5rem)', margin: 0, fontFamily: 'Montserrat, sans-serif', fontWeight: 800, textTransform: 'uppercase' }}
                     >
-                        The ANNUAL CULTURAL<br />FEST OF SLIET
+                        The ANNUAL CULTURAL{!isMobile && <br />}FEST OF SLIET
                     </motion.h2>
 
                     <motion.h1
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1.2, delay: 0.4 }}
-                        style={{ color: '#ebff00', fontSize: 'clamp(4rem, 12vw, 9rem)', margin: '10px 0 30px 0', fontFamily: '"Mystery Quest", system-ui', fontWeight: 'normal', textShadow: '4px 4px 0 rgba(0,0,0,0.5)' }}
+                        style={{ color: '#ebff00', fontSize: isMobile ? '4rem' : 'clamp(4rem, 12vw, 9rem)', margin: '10px 0 30px 0', fontFamily: '"Mystery Quest", system-ui', fontWeight: 'normal', textShadow: '4px 4px 0 rgba(0,0,0,0.5)' }}
                     >
                         mADHURAM'26
                     </motion.h1>
@@ -207,7 +328,7 @@ const Home = () => {
                     <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.6 }}>
                         <button
                             onClick={(e) => { e.stopPropagation(); navigate('/register'); }}
-                            style={{ background: '#ebff00', color: '#000', padding: '12px 36px', fontSize: '1.4rem', fontWeight: 900, borderRadius: '8px', cursor: 'pointer', fontFamily: 'Montserrat, sans-serif', transition: 'transform 0.2s', border: 'none' }}
+                            style={{ background: '#ebff00', color: '#000', padding: '12px 36px', fontSize: isMobile ? '1.1rem' : '1.4rem', fontWeight: 900, borderRadius: '8px', cursor: 'pointer', fontFamily: 'Montserrat, sans-serif', transition: 'transform 0.2s', border: 'none' }}
                             onMouseOver={(e) => e.target.style.transform = 'scale(1.05)'}
                             onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
                         >
@@ -215,96 +336,160 @@ const Home = () => {
                         </button>
                     </motion.div>
                 </div>
+
+                {/* TAP ANYWHERE hint */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: [0, 1, 0.5, 1] }}
+                    transition={{ delay: 1.5, duration: 2.5, repeat: Infinity, repeatType: 'mirror', ease: 'easeInOut' }}
+                    style={{
+                        position: 'absolute',
+                        bottom: isMobile ? '28px' : '36px',
+                        right: isMobile ? '20px' : '48px',
+                        zIndex: 3,
+                        textAlign: 'right',
+                        pointerEvents: 'none',
+                    }}
+                >
+                    <div style={{
+                        fontFamily: 'VT323, monospace',
+                        fontSize: isMobile ? '1.1rem' : '1.35rem',
+                        color: '#f700ff',
+                        letterSpacing: '3px',
+                        textShadow: '0 0 12px rgba(247,0,255,0.7)',
+                        lineHeight: 1,
+                    }}>
+                        ✦ {isMobile ? 'TOUCH' : 'TAP'} ANYWHERE
+                    </div>
+                    <div style={{
+                        width: '100%',
+                        height: '1px',
+                        background: 'linear-gradient(to right, transparent, rgba(247,0,255,0.5))',
+                        marginTop: '6px',
+                    }} />
+                </motion.div>
             </section>
 
-            {/* WHAT IS MADHURAM */}
+            {/* ── WHAT IS MADHURAM ── */}
             <motion.section
                 variants={scrollReveal}
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, margin: "-100px" }}
-                style={{ padding: '120px 10vw 80px 10vw', display: 'flex', gap: '60px', alignItems: 'center' }}
+                viewport={{ once: true, margin: '-100px' }}
+                style={{
+                    padding: isMobile ? '80px 8vw' : '60px 10vw 0',
+                    position: 'relative',
+                    overflow: 'visible',
+                    zIndex: 2,
+                    minHeight: isMobile ? 'auto' : '850px',
+                    display: 'flex',
+                    flexDirection: isMobile ? 'column' : 'row',
+                    alignItems: isMobile ? 'center' : 'center',
+                    justifyContent: 'space-between',
+                }}
             >
-                {/* TEXT CONTENT - Guaranteed to sit beside the images */}
-                <div style={{ flex: '0 0 45%', zIndex: 5 }}>
-                    <h2 style={{ color: '#ebff00', fontSize: 'clamp(3rem, 6vw, 5rem)', fontFamily: 'Montserrat, sans-serif', fontWeight: 900, lineHeight: '1', margin: 0, letterSpacing: '-2px', textShadow: '2px 2px 4px rgba(0,0,0,0.4)' }}>
-                        What is
-                        <br />
-                        <span style={{ fontFamily: '"Mystery Quest", system-ui', fontSize: '1.2em', fontWeight: 'normal', display: 'inline-block', marginLeft: '40px', marginTop: '-15px', color: '#ebff00' }}>mADHURAM'26?</span>
+                {/* 1. TEXT CONTENT (LEFT) */}
+                <div style={{
+                    flex: isMobile ? '0 0 auto' : '0 1 700px',
+                    textAlign: isMobile ? 'center' : 'left',
+                    zIndex: 11,
+                    position: 'relative',
+                    paddingBottom: isMobile ? '60px' : '200px',
+                    marginTop: isMobile ? '0' : '-100px'
+                }}>
+                    <h2 style={{ margin: 0, textTransform: 'none' }}>
+                        <span style={{
+                            display: 'block',
+                            color: '#ebff00',
+                            fontSize: isMobile ? '3rem' : '4rem',
+                            fontFamily: 'Montserrat, sans-serif',
+                            fontWeight: 900,
+                            lineHeight: 1
+                        }}>
+                            What is
+                        </span>
+                        <span style={{
+                            display: 'block',
+                            color: '#ebff00',
+                            fontSize: isMobile ? '3rem' : '4.5rem',
+                            fontFamily: '"Mystery Quest", system-ui',
+                            fontWeight: 'normal',
+                            lineHeight: 1,
+                            marginLeft: isMobile ? '0' : '80px',
+                            marginTop: '10px'
+                        }}>
+                            mADHURAM'26?
+                        </span>
                     </h2>
-                    <div style={{ marginTop: '40px', color: '#e0d6e6', fontSize: '0.95rem', opacity: 0.9, lineHeight: '1.8', fontFamily: 'Montserrat, sans-serif' }}>
-                        <p style={{ marginBottom: '20px' }}>Best days of your life!</p>
-                        <p style={{ marginBottom: '20px' }}>
-                            Madhuram is not a fest but an emotion, an expression of euphoria,
-                            with a footfall of over 1.5M+ students from over 7000+ colleges.
-                            Started long ago, attracting people from all over the globe ever since.
-                            Madhuram has lived through decades of musical and cultural change, not
-                            only keeping up with the times but setting new standards for cultural
-                            fests each year, and this time we are back with the 26th edition.
-                        </p>
-                        <p>Don't wait anymore, Register Now!</p>
+                    <div style={{ color: '#e0d6e6', fontSize: '1.05rem', lineHeight: 1.8, fontFamily: 'Montserrat, sans-serif', opacity: 0.95, maxWidth: isMobile ? '100%' : '750px', marginTop: '40px', textAlign: 'justify' }}>
+                        <p style={{ marginBottom: '16px' }}>Best Day of your life</p>
+                        <p style={{ marginBottom: '16px' }}>Madhuram is not a fest, it's a feeling. The cultural heartbeat of SLIET Longowal, where music, art, and raw talent collide into something unforgettable.</p>
+                        <p style={{ marginBottom: '16px' }}>What started as a spark has grown into Punjab's most electrifying celebration of student culture. Every edition, thousands pour in from colleges across the country — not just to compete, but to experience something that can't be replicated anywhere else.</p>
+                        <p style={{ marginBottom: '25px' }}>Decades in. Still setting the standard.</p>
+                        <p style={{ fontWeight: 600 }}>Don't miss your moment. Register Now.</p>
                     </div>
                 </div>
 
-                {/* DYNAMIC, OVER-THE-TOP LAYOUT: IMAGES SCALED UP AND BREAKING OUT */}
-                <div style={{ flex: '1 1 auto', position: 'relative', height: '650px', display: 'flex', justifyContent: 'center', alignItems: 'flex-end', marginLeft: '10px' }}>
+                {/* 2. PERFORMERS CONTAINER (DESKTOP ONLY) */}
+                {!isMobile && (
+                    <div style={{
+                        flex: '1 1 auto',
+                        position: 'relative',
+                        width: 'auto',
+                        height: '650px',
+                        display: 'flex',
+                        justifyContent: 'flex-end',
+                        alignItems: 'flex-end',
+                        overflow: 'visible',
+                        zIndex: 2,
+                        marginRight: '-8vw',
+                    }}>
+                        <div style={{ position: 'relative', width: 'auto', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'flex-end', bottom: '-75px' }}>
+                            {/* Guitarist */}
+                            <motion.img initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}
+                                src={img2} alt="Guitarist"
+                                style={{ height: '450px', width: 'auto', marginRight: '-120px', zIndex: 1, filter: 'drop-shadow(0 15px 30px rgba(0,0,0,0.8))' }} />
 
-                    {/* IMAGE 2 (GUITARIST - Left/Back Layer) */}
-                    <motion.img
-                        initial={{ opacity: 0, x: -50, y: 40 }}
-                        whileInView={{ opacity: 1, x: 0, y: 0 }}
-                        transition={{ duration: 0.8 }}
-                        src={img2}
-                        style={{ height: '100%', position: 'absolute', left: '-15%', bottom: '-20%', zIndex: 1, objectFit: 'contain', filter: 'drop-shadow(0 10px 15px rgba(0,0,0,0.6))' }}
-                        alt="Guitarist"
-                    />
+                            {/* Main Singer */}
+                            <motion.img initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }}
+                                src={img1} alt="Main Singer"
+                                style={{ height: '620px', width: 'auto', zIndex: 3, filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.9))' }} />
 
-                    {/* IMAGE 3 (GIRLS DANCING - Far Right/Back Layer) */}
-                    <motion.img
-                        initial={{ opacity: 0, x: 50, y: 10 }}
-                        whileInView={{ opacity: 1, x: 0, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
-                        src={img3}
-                        style={{ height: '110%', position: 'absolute', right: '-15%', bottom: '-22%', zIndex: 2, objectFit: 'contain', filter: 'drop-shadow(0 10px 15px rgba(0,0,0,0.6))' }}
-                        alt="Dancers"
-                    />
+                            {/* Dancers */}
+                            <motion.img initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.2 }}
+                                src={img3} alt="Dancers"
+                                style={{ height: '480px', width: 'auto', marginLeft: '-150px', zIndex: 2, filter: 'drop-shadow(0 15px 30px rgba(0,0,0,0.8))' }} />
+                        </div>
+                    </div>
+                )}
 
-                    {/* IMAGE 1 (MAIN SINGER - Right Foreground layer, HUGE) */}
-                    <motion.img
-                        initial={{ opacity: 0, scale: 0.8, y: 80 }}
-                        whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.4 }}
-                        src={img1}
-                        style={{ height: '110%', position: 'absolute', right: '5%', bottom: '-35%', zIndex: 3, objectFit: 'contain', filter: 'drop-shadow(-20px 20px 40px rgba(0,0,0,0.8))' }}
-                        alt="Main Singer"
-                    />
+                {/* 3. CLOUD BORDER (SHARED) */}
+                <div style={{
+                    position: 'absolute',
+                    bottom: isMobile ? '-25px' : '-165px',
+                    left: 0,
+                    width: '100vw',
+                    zIndex: 4,
+                    pointerEvents: 'none'
+                }}>
+                    <img src={borderCloud} alt="Cloud Border" style={{ width: '100%', height: 'auto', maxHeight: isMobile ? '135px' : '480px', objectFit: 'fill', display: 'block' }} />
                 </div>
             </motion.section>
 
-            {/* SEPARATOR CLOUD BORDER - FULL WIDTH OUTSIDE THE PADDING LIMITS */}
-            <div style={{ width: '100vw', marginLeft: 'calc(-50vw + 50%)', position: 'relative', zIndex: 4, marginTop: '-250px', pointerEvents: 'none', filter: 'drop-shadow(0 -10px 20px rgba(247,0,255,0.2))' }}>
-                <img
-                    src={borderCloud}
-                    alt="Cloud Border separator"
-                    style={{ width: '100%', height: 'auto', display: 'block', border: 'none' }}
-                />
-            </div>
-
-            {/* MOOD GALLERY */}
             <motion.section
                 variants={scrollReveal}
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px" }}
-                style={{ padding: '80px 10vw' }}
+                style={{ padding: isMobile ? '60px 5vw' : '80px 10vw' }}
             >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
-                    <div style={{ background: '#fff', color: '#000', padding: '8px 20px', fontSize: '2rem', fontWeight: 900, fontFamily: 'Montserrat, sans-serif' }}>MOOD</div>
-                    <div style={{ background: '#f700ff', color: '#fff', padding: '8px 20px', fontSize: '2rem', fontWeight: 900, fontFamily: 'Montserrat, sans-serif' }}>GALLERY</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px', justifyContent: isMobile ? 'center' : 'flex-start', flexWrap: 'wrap' }}>
+                    <div style={{ background: '#fff', color: '#000', padding: '8px 20px', fontSize: isMobile ? '1.5rem' : '2rem', fontWeight: 900, fontFamily: 'Montserrat, sans-serif' }}>MOOD</div>
+                    <div style={{ background: '#f700ff', color: '#fff', padding: '8px 20px', fontSize: isMobile ? '1.5rem' : '2rem', fontWeight: 900, fontFamily: 'Montserrat, sans-serif' }}>GALLERY</div>
                 </div>
-                <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '50px' }}>Explore the sonic and visual landscapes of our flagship events</p>
+                <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '50px', textAlign: isMobile ? 'center' : 'left' }}>Explore the sonic and visual landscapes of our flagship events</p>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(250px, 1fr))', gap: isMobile ? '14px' : '24px' }}>
                     {gallery.map((item, i) => (
                         <motion.div
                             key={i}
@@ -315,7 +500,7 @@ const Home = () => {
                             whileHover={{ scale: 1.03 }}
                             style={{ cursor: 'pointer' }}
                         >
-                            <div style={{ height: '300px', background: `url("${item.img}") center/cover`, border: `4px solid ${item.color}`, borderRadius: '12px', marginBottom: '16px' }}></div>
+                            <div style={{ height: isMobile ? '160px' : '300px', background: `url("${item.img}") center/cover`, border: `3px solid ${item.color}`, borderRadius: '10px', marginBottom: '10px' }}></div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <div>
                                     <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#fff', fontFamily: 'Montserrat, sans-serif' }}>{item.title}</h3>
@@ -334,26 +519,21 @@ const Home = () => {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px" }}
-                style={{ padding: '80px 10vw', textAlign: 'center' }}
+                style={{ padding: isMobile ? '60px 5vw' : '80px 10vw', textAlign: 'center' }}
             >
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px', marginBottom: '40px' }}>
-                    <div style={{ background: '#00f0ff', color: '#000', padding: '8px 20px', fontSize: '2rem', fontWeight: 900, fontFamily: 'Montserrat, sans-serif' }}>OFFICIAL</div>
-                    <div style={{ background: '#f700ff', color: '#fff', padding: '8px 20px', fontSize: '2rem', fontWeight: 900, fontFamily: 'Montserrat, sans-serif' }}>TRAILER</div>
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px', marginBottom: '40px', flexWrap: 'wrap' }}>
+                    <div style={{ background: '#00f0ff', color: '#000', padding: '8px 20px', fontSize: isMobile ? '1.5rem' : '2rem', fontWeight: 900, fontFamily: 'Montserrat, sans-serif' }}>OFFICIAL</div>
+                    <div style={{ background: '#f700ff', color: '#fff', padding: '8px 20px', fontSize: isMobile ? '1.5rem' : '2rem', fontWeight: 900, fontFamily: 'Montserrat, sans-serif' }}>TRAILER</div>
                 </div>
 
                 <div style={{
-                    position: 'relative',
-                    paddingBottom: '56.25%',
-                    height: 0,
-                    overflow: 'hidden',
-                    maxWidth: '100%',
-                    borderRadius: '16px',
-                    border: '4px solid rgba(0, 240, 255, 0.3)',
+                    position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden',
+                    maxWidth: '100%', borderRadius: '16px', border: '4px solid rgba(0, 240, 255, 0.3)',
                     boxShadow: '0 0 40px rgba(0, 240, 255, 0.2)'
                 }}>
                     <iframe
                         style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                        src="https://www.youtube.com/embed/TntPd_3u-Xg"
+                        src="https://www.youtube.com/embed/b31xOodlcxg"
                         title="Madhuram 2026 Trailer"
                         frameBorder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -368,66 +548,111 @@ const Home = () => {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px" }}
-                style={{ padding: '100px 10vw 150px 10vw' }}
+                style={{ padding: isMobile ? '80px 6vw' : '150px 10vw 250px', background: 'transparent', position: 'relative', zIndex: 5 }}
             >
-                {/* Forced Side-By-Side Flex layout to ensure it sits exactly next to questions, not above */}
-                <div style={{ display: 'flex', gap: '60px', alignItems: 'flex-start' }}>
-
+                <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? '60px' : '100px', alignItems: 'flex-start' }}>
                     {/* LEFT COLUMN: TITLE */}
-                    <div style={{ flex: '0 0 320px', position: 'sticky', top: '100px' }}>
-                        <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#f700ff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '30px' }}>
-                            <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: '4px solid #fff' }}></div>
-                        </div>
-                        <h2 style={{ color: '#ebff00', fontSize: '3rem', fontFamily: 'Montserrat, sans-serif', fontWeight: 900, lineHeight: '1.1', margin: 0 }}>
+                    <div style={{
+                        flex: isMobile ? 'unset' : '0 0 380px',
+                        position: isMobile ? 'relative' : 'sticky',
+                        top: '120px',
+                        height: 'fit-content',
+                        marginBottom: isMobile ? '80px' : '0',
+                        zIndex: 10
+                    }}>
+                        <div style={{ display: 'inline-block', padding: '8px 20px', background: 'rgba(247, 0, 255, 0.1)', border: '1px solid rgba(247, 0, 255, 0.3)', borderRadius: '30px', color: '#f700ff', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '2px', marginBottom: '24px', fontFamily: 'Montserrat, sans-serif' }}>SUPPORT CENTER</div>
+                        <h2 style={{
+                            color: '#ebff00',
+                            fontSize: isMobile ? '3.2rem' : '4rem',
+                            fontFamily: 'Montserrat, sans-serif',
+                            fontWeight: 900,
+                            lineHeight: '0.9',
+                            margin: 0,
+                            letterSpacing: '-2px'
+                        }}>
                             ANY QUESTIONS?<br />
-                            <span style={{ fontFamily: '"Mystery Quest", system-ui', fontWeight: 'normal', fontSize: '1.2em', color: '#ebff00' }}>WE GOT YOU.</span>
+                            <span style={{ fontFamily: '"Mystery Quest", system-ui', fontWeight: 'normal', fontSize: '0.85em', color: '#fff', display: 'block', marginTop: '10px' }}>WE GOT YOU.</span>
                         </h2>
                     </div>
 
-                    {/* RIGHT COLUMN: ACTUAL QUESTIONS */}
-                    <div style={{ flex: '1 1 auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {/* RIGHT COLUMN: QUESTIONS */}
+                    <div style={{ flex: '1 1 auto', display: 'flex', flexDirection: 'column', gap: '24px', width: '100%', zIndex: 1 }}>
                         {faqs.map((faq, index) => (
-                            <div
+                            <motion.div
                                 key={index}
+                                initial={false}
+                                whileHover={{ scale: 1.01, background: 'rgba(255,255,255,0.05)' }}
                                 onClick={() => setOpenFaq(openFaq === index ? null : index)}
                                 style={{
-                                    background: openFaq === index ? '#D1FF00' : 'rgba(253, 243, 231, 0.95)',
-                                    color: '#000',
-                                    padding: '24px 30px',
-                                    borderRadius: '16px',
-                                    display: 'flex',
-                                    flexDirection: 'column',
+                                    background: openFaq === index ? 'rgba(235, 255, 0, 0.05)' : 'rgba(255,255,255,0.03)',
+                                    backgroundImage: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%)',
+                                    border: `1px solid ${openFaq === index ? '#ebff00' : 'rgba(255,255,255,0.1)'}`,
+                                    borderRadius: '24px',
+                                    padding: isMobile ? '24px' : '32px',
                                     cursor: 'pointer',
-                                    transition: 'background 0.3s ease',
-                                    fontWeight: 'bold',
-                                    fontFamily: 'Montserrat, sans-serif'
+                                    transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                                    position: 'relative',
+                                    overflow: 'hidden',
+                                    backdropFilter: 'blur(10px)',
+                                    boxShadow: openFaq === index ? '0 10px 30px rgba(235, 255, 0, 0.1)' : 'none'
                                 }}
                             >
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <span>{faq.q}</span>
-                                    <span style={{ fontSize: '1.5rem', fontWeight: 'bold', transform: openFaq === index ? 'rotate(45deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease' }}>
-                                        +
-                                    </span>
+                                    <span style={{
+                                        fontSize: isMobile ? '1.1rem' : '1.3rem',
+                                        color: openFaq === index ? '#ebff00' : '#fff',
+                                        fontFamily: 'Montserrat, sans-serif',
+                                        fontWeight: 800,
+                                        transition: 'color 0.3s ease'
+                                    }}>{faq.q}</span>
+                                    <div style={{
+                                        width: '40px', height: '40px', borderRadius: '50%',
+                                        background: openFaq === index ? '#ebff00' : 'rgba(255,255,255,0.05)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        transition: 'all 0.3s ease',
+                                        flexShrink: 0
+                                    }}>
+                                        <motion.span
+                                            animate={{ rotate: openFaq === index ? 135 : 0 }}
+                                            style={{
+                                                fontSize: '24px',
+                                                fontWeight: '300',
+                                                color: openFaq === index ? '#000' : '#fff',
+                                                lineHeight: '1',
+                                                display: 'block',
+                                                marginTop: '-2px'
+                                            }}
+                                        >+</motion.span>
+                                    </div>
                                 </div>
                                 <AnimatePresence>
                                     {openFaq === index && (
                                         <motion.div
                                             initial={{ height: 0, opacity: 0, marginTop: 0 }}
-                                            animate={{ height: 'auto', opacity: 1, marginTop: '16px' }}
+                                            animate={{ height: 'auto', opacity: 1, marginTop: '24px' }}
                                             exit={{ height: 0, opacity: 0, marginTop: 0 }}
-                                            style={{ color: '#333', fontWeight: 'normal', fontSize: '0.95rem', overflow: 'hidden' }}
+                                            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                                            style={{ overflow: 'hidden' }}
                                         >
-                                            {faq.a}
+                                            <div style={{
+                                                color: 'rgba(255,255,255,0.7)',
+                                                fontSize: '1rem',
+                                                lineHeight: '1.8',
+                                                fontFamily: 'Montserrat, sans-serif',
+                                                borderTop: '1px solid rgba(255,255,255,0.1)',
+                                                paddingTop: '24px'
+                                            }}>
+                                                {faq.a}
+                                            </div>
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
-                            </div>
+                            </motion.div>
                         ))}
                     </div>
-
                 </div>
             </motion.section>
-        </div>
+        </div >
     );
 };
 

@@ -1,13 +1,19 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const About = () => {
     const navigate = useNavigate();
     const containerRef = useRef(null);
     const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start end", "end start"] });
-    const yParallax = useTransform(scrollYProgress, [0, 1], [0, -150]);
-    const scaleParallax = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
+    const yParallax = useTransform(scrollYProgress, [0, 1], [0, -100]);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 1024);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const timeline = [
         { title: 'FOUNDING', desc: 'The journey began with a vision to revolutionize technical education in the region.', tag: '1989 ORIGINS', color: 'var(--yellow)', icon: '🏛️' },
@@ -18,100 +24,82 @@ const About = () => {
 
     return (
         <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            style={{ padding: '60px', margin: '40px', border: '2px solid var(--pink)', borderRadius: '24px', background: 'rgba(255,255,255,0.02)' }}
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}
+            style={{
+                padding: isMobile ? '30px 20px' : '60px',
+                margin: isMobile ? '20px 10px' : '40px',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: '24px',
+                background: 'rgba(255,255,255,0.02)',
+                overflow: 'hidden'
+            }}
             ref={containerRef}
         >
-            <div style={{ display: 'flex', gap: '40px', alignItems: 'center', marginBottom: '80px' }}>
-                <div style={{ flex: 1 }}>
-                    <motion.div
-                        initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }}
-                        style={{ background: 'var(--pink)', color: '#fff', fontSize: '0.8rem', padding: '4px 16px', display: 'inline-block', fontWeight: 'bold', borderRadius: '4px', marginBottom: '24px' }}>
+            {/* HERO SECTION */}
+            <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '40px', alignItems: 'center', marginBottom: '80px' }}>
+                <div style={{ flex: 1, textAlign: isMobile ? 'center' : 'left' }}>
+                    <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
+                        style={{ background: 'var(--pink)', color: '#fff', fontSize: '0.7rem', padding: '4px 12px', display: 'inline-block', fontWeight: 900, borderRadius: '4px', marginBottom: '20px', letterSpacing: '2px' }}>
                         ESTABLISHED 1989
                     </motion.div>
-                    <motion.h1 style={{ fontSize: '4rem', color: '#fff', margin: 0, lineHeight: 1, fontFamily: 'var(--font-display)', y: yParallax }}>THE</motion.h1>
-                    <motion.h1 style={{ fontSize: '5rem', WebkitTextStroke: '2px var(--pink)', color: 'transparent', margin: 0, lineHeight: 1, fontFamily: 'var(--font-display)', y: useTransform(scrollYProgress, [0, 1], [0, -200]) }}>MADHURAM</motion.h1>
-                    <motion.h1 style={{ fontSize: '6rem', color: 'var(--yellow)', margin: 0, lineHeight: 1, textShadow: '0 0 20px var(--yellow)', fontFamily: 'var(--font-display)', y: useTransform(scrollYProgress, [0, 1], [0, -250]) }}>LEGACY</motion.h1>
-
-                    <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginTop: '24px', marginBottom: '32px', maxWidth: '400px' }}>
+                    <motion.h1 style={{ fontSize: isMobile ? '3rem' : '4.5rem', color: '#fff', margin: 0, lineHeight: 1, fontFamily: 'var(--font-logo)', y: yParallax }}>THE</motion.h1>
+                    <motion.h1 style={{ fontSize: isMobile ? '4rem' : '6rem', WebkitTextStroke: '1px var(--pink)', color: 'transparent', margin: 0, lineHeight: 1, fontFamily: 'var(--font-logo)', x: isMobile ? 0 : 20 }}>MADHURAM</motion.h1>
+                    <motion.h1 style={{ fontSize: isMobile ? '5rem' : '7.5rem', color: 'var(--yellow)', margin: 0, lineHeight: 1, textShadow: '0 0 20px rgba(252, 238, 10, 0.3)', fontFamily: 'var(--font-logo)' }}>LEGACY</motion.h1>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '1rem', marginTop: '30px', marginBottom: '40px', maxWidth: '450px', marginLeft: isMobile ? 'auto' : '0', marginRight: isMobile ? 'auto' : '0' }}>
                         Forging inclusive cultural bridges through technical excellence and artistic expression in the heart of Punjab.
                     </p>
-
-                    <button className="btn-primary" onClick={() => navigate('/events')} style={{ transition: 'all 0.3s' }}>EXPLORE ARCHIVE</button>
+                    <button className="btn-primary" onClick={() => navigate('/events')}>EXPLORE ARCHIVE</button>
                 </div>
-
-                <div style={{ flex: 1, height: '400px', borderRadius: '12px', border: '2px solid var(--pink)', background: 'url(https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=1000&q=80) center/cover', position: 'relative', boxShadow: '0 0 30px rgba(247,0,255,0.3)', filter: 'sepia(30%) hue-rotate(-30deg)' }}>
-                    <div style={{ position: 'absolute', bottom: '20px', left: '20px', color: 'var(--yellow)', fontSize: '2.5rem', fontWeight: 900, fontFamily: 'var(--font-heading)' }}>
-                        मधुरम्
+                {!isMobile && (
+                    <div style={{ flex: 1, height: '500px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.1)', background: 'url(https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=1000&q=80) center/cover', position: 'relative', overflow: 'hidden' }}>
+                        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(transparent, rgba(18, 9, 33, 0.8))' }} />
+                        <div style={{ position: 'absolute', bottom: '30px', left: '30px', color: 'var(--yellow)', fontSize: '3rem', fontWeight: 900, fontFamily: 'var(--font-logo)' }}>मधुरम्</div>
                     </div>
-                </div>
+                )}
             </div>
 
-            <motion.div
-                initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}
-                style={{ background: 'var(--bg-card)', padding: '60px', borderRadius: '16px', borderLeft: '4px solid var(--yellow)', marginBottom: '100px' }}
-            >
-                <div style={{ color: 'var(--pink)', fontWeight: 'bold', letterSpacing: '4px', marginBottom: '24px', fontSize: '0.9rem', fontFamily: 'var(--font-sub)' }}>OUR MISSION</div>
-                <div style={{ fontSize: '2.5rem', lineHeight: 1.4, color: '#fff', fontFamily: 'var(--font-sub)' }}>
-                    "To serve as a <span style={{ color: 'var(--yellow)', fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>dynamic catalyst</span> for cultural integration, bridging the gap between technical innovation and human expression through <span style={{ color: 'var(--pink)', borderBottom: '4px solid var(--pink)' }}>inclusive excellence</span>."
+            {/* MISSION */}
+            <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+                style={{ background: 'rgba(255,255,255,0.03)', padding: isMobile ? '40px 20px' : '80px', borderRadius: '20px', borderLeft: '6px solid var(--pink)', marginBottom: '100px', textAlign: 'center' }}>
+                <div style={{ color: 'var(--cyan)', fontWeight: 900, letterSpacing: '4px', marginBottom: '30px', fontSize: '0.8rem' }}>OUR MISSION</div>
+                <div style={{ fontSize: isMobile ? '1.8rem' : '3.2rem', lineHeight: 1.3, color: '#fff', fontWeight: 900 }}>
+                    "Bridging the gap between <span style={{ color: 'var(--yellow)' }}>technical innovation</span> and human expression through <span style={{ color: 'var(--pink)' }}>inclusive excellence</span>."
                 </div>
             </motion.div>
 
-            <motion.div
-                initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}
-                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '2px solid var(--pink)', paddingBottom: '16px', marginBottom: '40px' }}
-            >
-                <h2 style={{ fontSize: '3rem', margin: 0, color: '#fff', fontFamily: 'var(--font-display)' }}>SLIET TIMELINE</h2>
-                <div style={{ color: 'var(--yellow)', textAlign: 'right' }}>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 'bold', letterSpacing: '8px' }}>::::::</div>
-                    <div style={{ fontSize: '0.8rem', letterSpacing: '2px', fontFamily: 'var(--font-sub)' }}>HISTORICAL PROGRESS</div>
-                </div>
-            </motion.div>
+            {/* TIMELINE */}
+            <div style={{ marginBottom: '60px', textAlign: isMobile ? 'center' : 'left' }}>
+                <h2 style={{ fontSize: isMobile ? '2.5rem' : '4rem', margin: 0, color: '#fff', fontFamily: 'var(--font-logo)' }}>SLIET TIMELINE</h2>
+                <div style={{ color: 'var(--yellow)', marginTop: '10px', fontSize: '1rem', fontWeight: 700, letterSpacing: '2px' }}>A JOURNEY OF GROWTH</div>
+            </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', marginBottom: '80px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px', marginBottom: '100px' }}>
                 {timeline.map((item, i) => (
-                    <motion.div
-                        key={i}
-                        initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ delay: i * 0.15 }}
-                        whileHover={{ y: -10 }}
-                        style={{ border: '1px solid rgba(255,255,255,0.1)', background: 'var(--bg-card)', padding: '32px', borderRadius: '12px', position: 'relative', overflow: 'hidden' }}
-                    >
-                        <div style={{ position: 'absolute', top: '-10px', right: '-10px', fontSize: '8rem', color: 'rgba(255,255,255,0.03)', fontWeight: 900, pointerEvents: 'none', fontFamily: 'var(--font-display)' }}>
-                            {item.title.split(' ')[0]}
-                        </div>
-                        <div style={{ color: item.color, fontSize: '2rem', marginBottom: '16px' }}>{item.icon}</div>
-                        <h3 style={{ color: item.color, fontSize: '1.5rem', marginBottom: '16px', fontFamily: 'var(--font-sub)' }}>{item.title}</h3>
-                        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '24px', minHeight: '80px' }}>{item.desc}</p>
-                        <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.1)', color: '#fff', padding: '4px 12px', fontSize: '0.7rem', fontWeight: 'bold' }}>
-                            {item.tag}
-                        </div>
+                    <motion.div key={i} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} viewport={{ once: true }}
+                        style={{ background: 'rgba(255,255,255,0.02)', padding: '35px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)', position: 'relative' }}>
+                        <div style={{ fontSize: '3rem', marginBottom: '20px' }}>{item.icon}</div>
+                        <h3 style={{ color: item.color, fontSize: '1.6rem', fontWeight: 900, marginBottom: '15px' }}>{item.title}</h3>
+                        <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '25px' }}>{item.desc}</p>
+                        <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.05)', color: '#fff', padding: '6px 16px', fontSize: '0.75rem', fontWeight: 900, borderRadius: '4px' }}>{item.tag}</div>
                     </motion.div>
                 ))}
             </div>
 
-            <div style={{ display: 'flex', gap: '24px' }}>
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}
-                    style={{ flex: 2, height: '400px', borderRadius: '12px', position: 'relative', overflow: 'hidden' }}
-                >
-                    <motion.div style={{ position: 'absolute', inset: 0, originY: 0.5, background: 'url("/wall-of-fame/Devine Divas 2.jpeg") center/cover', scale: scaleParallax }} />
-                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(transparent, #000 90%)' }}></div>
+            {/* GALLERIES */}
+            <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '30px' }}>
+                <div style={{ flex: 2, height: isMobile ? '300px' : '450px', borderRadius: '20px', overflow: 'hidden', position: 'relative' }}>
+                    <div style={{ position: 'absolute', inset: 0, background: 'url(/wall-of-fame/Devine Divas 2.jpeg) center/cover' }} />
+                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(transparent, rgba(0,0,0,0.8))' }} />
                     <div style={{ position: 'absolute', bottom: '30px', left: '30px' }}>
-                        <h3 style={{ color: '#fff', fontSize: '2.5rem', margin: 0, fontFamily: 'var(--font-display)' }}>FUTURE READY</h3>
-                        <div style={{ color: 'var(--pink)', fontWeight: 'bold', fontFamily: 'var(--font-sub)' }}>Blending Tradition with Tomorrow</div>
+                        <h3 style={{ color: '#fff', fontSize: '2.5rem', margin: 0, fontWeight: 900 }}>FUTURE READY</h3>
+                        <div style={{ color: 'var(--pink)', fontWeight: 800, letterSpacing: '2px' }}>TRADITION MEETS INNOVATION</div>
                     </div>
-                </motion.div>
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: 0.2 }}
-                    style={{ flex: 1, height: '400px', borderRadius: '12px', background: 'radial-gradient(circle, var(--yellow), #ffa500)', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '32px' }}
-                >
-                    <div style={{ fontSize: '4rem', color: '#000', marginBottom: '16px' }}>⚡</div>
-                    <h3 style={{ color: '#000', fontSize: '2rem', margin: 0, lineHeight: 1.1, fontFamily: 'var(--font-display)' }}>HIGH CONTRAST<br />CULTURE</h3>
-                    <p style={{ color: '#000', fontWeight: 'bold', marginTop: '16px', fontSize: '0.9rem' }}>Where static meets dynamic in an explosion of creativity.</p>
-                </motion.div>
+                </div>
+                <div style={{ flex: 1, height: isMobile ? '300px' : '450px', borderRadius: '20px', background: 'var(--yellow)', padding: '40px', display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center' }}>
+                    <div style={{ fontSize: '4rem', color: '#000', marginBottom: '20px' }}>⚡</div>
+                    <h3 style={{ color: '#000', fontSize: '2.2rem', fontWeight: 900, lineHeight: 1.1, margin: 0 }}>VIBRANT CULTURE</h3>
+                    <p style={{ color: '#000', fontWeight: 700, marginTop: '20px', opacity: 0.8 }}>An explosion of creativity in every corner.</p>
+                </div>
             </div>
         </motion.div>
     );
