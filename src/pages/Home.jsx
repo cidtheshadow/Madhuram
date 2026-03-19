@@ -31,10 +31,10 @@ const Home = () => {
     };
 
     const gallery = [
-        { title: 'Devine Divas', subtitle: 'Wall of Fame', img: '/wall-of-fame/Devine Divas.jpeg', color: '#f700ff' },
-        { title: 'Khasa Ala Chahar', subtitle: 'Wall of Fame', img: '/wall-of-fame/Khasa Ala.jpeg', color: '#ebff00' },
-        { title: 'Modelling', subtitle: 'Wall of Fame', img: '/wall-of-fame/Modelling.jpeg', color: '#00f0ff' },
-        { title: 'Highlights', subtitle: 'Wall of Fame', img: '/wall-of-fame/WhatsApp Image 2026-03-14 at 11.34.22.jpeg', color: '#f700ff' },
+        { title: 'Devine Divas', subtitle: 'Wall of Fame', img: '/wall-of-fame/devine_divas_opt.jpeg', color: '#f700ff' },
+        { title: 'Khasa Ala Chahar', subtitle: 'Wall of Fame', img: '/wall-of-fame/khasa_ala_opt.jpeg', color: '#ebff00' },
+        { title: 'Modelling', subtitle: 'Wall of Fame', img: '/wall-of-fame/modelling_opt.jpeg', color: '#00f0ff' },
+        { title: 'Highlights', subtitle: 'Wall of Fame', img: '/wall-of-fame/highlights_opt.jpeg', color: '#f700ff' },
     ];
 
     const faqs = [
@@ -64,7 +64,7 @@ const Home = () => {
         };
         window.addEventListener('resize', resizeCanvas);
 
-        const numParticles = Math.min(Math.floor(width / 50), 30);
+        const numParticles = isMobile ? 12 : Math.min(Math.floor(width / 50), 30);
         const particles = [];
         const tapFlowers = []; // interactive spawned flowers
         const colors = ['#D1FF00', '#f700ff', '#00f0ff', '#FF0055'];
@@ -73,9 +73,9 @@ const Home = () => {
             particles.push({
                 x: Math.random() * width,
                 y: Math.random() * height,
-                vx: (Math.random() - 0.5) * 0.8,
-                vy: (Math.random() - 0.5) * 0.8,
-                radius: 12 + Math.random() * 20,
+                vx: (Math.random() - 0.5) * (isMobile ? 0.4 : 0.8),
+                vy: (Math.random() - 0.5) * (isMobile ? 0.4 : 0.8),
+                radius: (isMobile ? 8 : 12) + Math.random() * (isMobile ? 10 : 20),
                 color: colors[Math.floor(Math.random() * colors.length)],
                 type: Math.floor(Math.random() * 4)
             });
@@ -496,11 +496,25 @@ const Home = () => {
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
-                            transition={{ duration: 0.6, delay: i * 0.1, ease: "easeOut" }}
+                            transition={{ duration: 0.6, delay: i * 0.05, ease: "easeOut" }}
                             whileHover={{ scale: 1.03 }}
                             style={{ cursor: 'pointer' }}
                         >
-                            <div style={{ height: isMobile ? '160px' : '300px', background: `url("${item.img}") center/cover`, border: `3px solid ${item.color}`, borderRadius: '10px', marginBottom: '10px' }}></div>
+                            <div style={{
+                                height: isMobile ? '160px' : '300px',
+                                background: `url("${item.img}") center/cover`,
+                                border: `3px solid ${item.color}`,
+                                borderRadius: '10px',
+                                marginBottom: '10px',
+                                position: 'relative'
+                            }}>
+                                <img
+                                    src={item.img}
+                                    style={{ display: 'none' }}
+                                    loading="lazy"
+                                    alt={item.title}
+                                />
+                            </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <div>
                                     <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#fff', fontFamily: 'Montserrat, sans-serif' }}>{item.title}</h3>

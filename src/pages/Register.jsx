@@ -33,7 +33,15 @@ const RegistrationForm = ({ isSliet, onBack, initialEvent, isMobile }) => {
         }
         try {
             const table = isSliet ? 'sliet_registrations' : 'non_sliet_registrations';
-            const { error } = await supabase.from(table).insert([formData]);
+            
+            // Filter out fields not present in sliet_registrations schema if needed
+            let dataToSubmit = { ...formData };
+            if (isSliet) {
+                const { accommodation, payment_paid, ...filteredData } = dataToSubmit;
+                dataToSubmit = filteredData;
+            }
+
+            const { error } = await supabase.from(table).insert([dataToSubmit]);
             if (error) throw error;
             setStatus('success');
         } catch (err) {
