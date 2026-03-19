@@ -34,10 +34,10 @@ const RegistrationForm = ({ isSliet, onBack, initialEvent, isMobile }) => {
         try {
             const table = isSliet ? 'sliet_registrations' : 'non_sliet_registrations';
             
-            // Filter out fields not present in sliet_registrations schema if needed
+            // Filter out fields not present in sliet_registrations schema
             let dataToSubmit = { ...formData };
             if (isSliet) {
-                const { accommodation, payment_paid, ...filteredData } = dataToSubmit;
+                const { accommodation, payment_paid, college_name, ...filteredData } = dataToSubmit;
                 dataToSubmit = filteredData;
             }
 
