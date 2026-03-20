@@ -228,7 +228,7 @@ const Register = () => {
                         <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '30px', justifyContent: 'center' }}>
                             <button onClick={() => setRegistrationState('sliet')} className="btn-primary"
                                 style={{ background: 'var(--pink)', padding: '25px 60px', borderRadius: '20px', fontSize: '1.4rem', boxShadow: '0 20px 40px rgba(247,0,255,0.2)' }}>INTERNAL_SLIET</button>
-                            <button onClick={() => window.location.href = 'https://unstop.com/c/sant-longowal-institute-of-engineering-and-technology-675999'} className="btn-primary"
+                            <button onClick={() => window.location.href = 'https://unstop.com/college-fests/madhuram26-sant-longowal-institute-of-engineering-and-technology-longowal-punjab-450932'} className="btn-primary"
                                 style={{ background: 'var(--cyan)', color: '#000', padding: '25px 60px', borderRadius: '20px', fontSize: '1.4rem', boxShadow: '0 20px 40px rgba(0,240,255,0.2)' }}>EXTERNAL_GUEST</button>
                         </div>
                     </motion.div>
