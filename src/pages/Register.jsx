@@ -42,7 +42,10 @@ const RegistrationForm = ({ isSliet, onBack, initialEvent, isMobile }) => {
                     name: formData.name,
                     trade: formData.trade,
                     event_name: formData.event_name,
-                    reg_no: formData.reg_no
+                    reg_no: formData.reg_no,
+                    whatsapp_no: formData.whatsapp_no,
+                    performance_type: formData.performance_type,
+                    performance_details: formData.performance_details
                 };
             } else {
                 dataToSubmit = { ...formData };
