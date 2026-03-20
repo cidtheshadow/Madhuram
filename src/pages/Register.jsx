@@ -37,7 +37,7 @@ const RegistrationForm = ({ isSliet, onBack, initialEvent, isMobile }) => {
             // STRICT FILTER: Only send fields confirmed in the schema to avoid cache errors
             let dataToSubmit = {};
             if (isSliet) {
-                // Internal schema only expects these core fields
+                // Internal schema expects these core fields
                 dataToSubmit = {
                     name: formData.name,
                     trade: formData.trade,
