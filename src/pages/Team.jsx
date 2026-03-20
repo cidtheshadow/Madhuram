@@ -51,11 +51,11 @@ const Team = () => {
     }, []);
 
     const architects = [
-        { tag: "01", role: "Patron-In-Chief", name: "DR. MANI KANT PASWAN", color: "var(--pink)", desc: "Lead mastermind directing the overall vision and academic alignment of Madhuram'26.", img: "/team/1.png", linkedin: "https://www.linkedin.com/in/mani-kant-paswan-3359b314a/" },
-        { tag: "02", role: "Patron", name: "PROF. V.K. KUKREJA", color: "var(--cyan)", desc: "Strategic lead ensuring seamless execution of cross-departmental operations.", img: "/team/2.png", linkedin: "https://www.linkedin.com/in/vijay-kukreja-7a001120/" },
-        { tag: "03", role: "Chairman", name: "PROF. INDRAJ SINGH", color: "var(--yellow)", desc: "Scaling the logistical networks and core operational engine of the festival.", img: "/team/3.png", linkedin: "https://www.linkedin.com/in/indraj-singh-3b88831a3/" },
-        { tag: "04", role: "Vice-Chairman", name: "ER. ANSHUKA BANSAL", color: "#00ff88", desc: "Curator of aesthetics and cultural programming dictating the soul of the event.", img: "/team/4.png", linkedin: "https://sliet.ac.in/people/anshuka/" },
-        { tag: "05", role: "Vice-Chairman", name: "PROF. MOHD. MAJID", color: "var(--pink)", desc: "Driving innovation and oversight of specialized technical frameworks.", img: "/team/5.jpeg", linkedin: "#" }
+        { tag: "01", role: "Patron-In-Chief", name: "PROF. MANI KANT PASWAN (Director SLIET)", color: "var(--pink)", desc: "Lead mastermind directing the overall vision and academic alignment of Madhuram'26.", img: "/team/1.png", linkedin: "https://www.linkedin.com/in/mani-kant-paswan-3359b314a/" },
+        { tag: "02", role: "Patron", name: "PROF. V.K. KUKREJA (Dean SW)", color: "var(--cyan)", desc: "Strategic lead ensuring seamless execution of cross-departmental operations.", img: "/team/2.png", linkedin: "https://www.linkedin.com/in/vijay-kukreja-7a001120/" },
+        { tag: "03", role: "Chairman", name: "PROF. INDRAJ  (Prof. ME)", color: "var(--yellow)", desc: "Scaling the logistical networks and core operational engine of the festival.", img: "/team/3.png", linkedin: "https://www.linkedin.com/in/indraj-singh-3b88831a3/" },
+        { tag: "04", role: "Vice-Chairman", name: "ER. ANSHUKA BANSAL (AsP EIE)", color: "#00ff88", desc: "Curator of aesthetics and cultural programming dictating the soul of the event.", img: "/team/4.png", linkedin: "https://sliet.ac.in/people/anshuka/" },
+        { tag: "05", role: "Vice-Chairman", name: "DR. MOHD. MAJID (AsP ME)", color: "var(--pink)", desc: "Driving innovation and oversight of specialized technical frameworks.", img: "/team/5.jpeg", linkedin: "#" }
     ];
 
     const coreTeam = [
@@ -125,34 +125,58 @@ const Team = () => {
                     <h2 style={{ color: '#fff', fontSize: isMobile ? '2.5rem' : '4rem', fontWeight: 900, lineHeight: 1.1, marginBottom: '20px' }}>ESTABLISH <br /><span style={{ color: 'var(--pink)' }}>CONNECTION</span></h2>
                     <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem', marginBottom: '50px' }}>Relay your transmission directly to the neural core.</p>
 
-                    <form onSubmit={(e) => e.preventDefault()} style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
+                    <form onSubmit={(e) => e.preventDefault()} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                         <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '20px' }}>
-                            <input type="text" placeholder="IDENTIFIER" style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', padding: '20px', borderRadius: '12px', color: '#fff', outline: 'none' }} />
-                            <input type="email" placeholder="COMM_CHANNEL@NET" style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', padding: '20px', borderRadius: '12px', color: '#fff', outline: 'none' }} />
+                            <div style={{ flex: 1 }}>
+                                <div style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--pink)', letterSpacing: '2px', marginBottom: '8px' }}>IDENTIFIER</div>
+                                <input type="text" placeholder="NAME / CODENAME" style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', padding: isMobile ? '16px' : '20px', borderRadius: '12px', color: '#fff', outline: 'none', fontSize: '0.9rem' }} />
+                            </div>
+                            <div style={{ flex: 1 }}>
+                                <div style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--pink)', letterSpacing: '2px', marginBottom: '8px' }}>COMM_CHANNEL</div>
+                                <input type="email" placeholder="EMAIL_ID" style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', padding: isMobile ? '16px' : '20px', borderRadius: '12px', color: '#fff', outline: 'none', fontSize: '0.9rem' }} />
+                            </div>
                         </div>
-                        <textarea placeholder="ENTER_TRANSMISSION_DATA..." rows="5" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', padding: '20px', borderRadius: '12px', color: '#fff', outline: 'none', resize: 'none' }} />
-                        <button className="btn-primary" style={{ padding: '20px', fontSize: '1.1rem', letterSpacing: '4px' }}>EXECUTE TRANSMISSION <Send size={20} style={{ marginLeft: '10px' }} /></button>
+                        <div>
+                            <div style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--pink)', letterSpacing: '2px', marginBottom: '8px' }}>TRANSMISSION_DATA</div>
+                            <textarea placeholder="ENTER_MESSAGE..." rows="5" style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', padding: isMobile ? '16px' : '20px', borderRadius: '12px', color: '#fff', outline: 'none', resize: 'none', fontSize: '0.9rem' }} />
+                        </div>
+                        <button className="btn-primary" style={{ padding: isMobile ? '16px' : '20px', fontSize: isMobile ? '1rem' : '1.1rem', letterSpacing: '4px', width: '100%' }}>
+                            EXECUTE TRANSMISSION <Send size={20} style={{ marginLeft: '10px' }} />
+                        </button>
                     </form>
                 </div>
 
-                <div style={{ flex: 1, background: 'rgba(255,255,255,0.03)', borderRadius: '30px', padding: '40px', display: 'flex', flexDirection: 'column', gap: '40px' }}>
-                    <div style={{ display: 'flex', gap: '20px' }}>
-                        <MapPin color="var(--pink)" size={32} />
+                <div style={{
+                    flex: 1,
+                    background: 'rgba(255,255,255,0.03)',
+                    borderRadius: '32px',
+                    padding: isMobile ? '30px' : '40px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: isMobile ? '30px' : '40px',
+                    border: '1px solid rgba(255,255,255,0.02)'
+                }}>
+                    <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
+                        <div style={{ background: 'rgba(247,0,255,0.1)', padding: '12px', borderRadius: '12px' }}>
+                            <MapPin color="var(--pink)" size={24} />
+                        </div>
                         <div>
-                            <div style={{ color: 'var(--pink)', fontWeight: 900, fontSize: '0.75rem', letterSpacing: '1px' }}>BASE OPS</div>
-                            <div style={{ color: '#fff', fontSize: '1.1rem', marginTop: '5px' }}>SLIET Longowal, Punjab</div>
+                            <div style={{ color: 'var(--pink)', fontWeight: 900, fontSize: '0.7rem', letterSpacing: '2px', marginBottom: '4px' }}>BASE OPS</div>
+                            <div style={{ color: '#fff', fontSize: '1rem', fontWeight: 600, lineHeight: 1.4 }}>SLIET Longowal,<br />Punjab, India</div>
                         </div>
                     </div>
-                    <div style={{ display: 'flex', gap: '20px' }}>
-                        <Mail color="var(--pink)" size={32} />
+                    <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
+                        <div style={{ background: 'rgba(247,0,255,0.1)', padding: '12px', borderRadius: '12px' }}>
+                            <Mail color="var(--pink)" size={24} />
+                        </div>
                         <div>
-                            <div style={{ color: 'var(--pink)', fontWeight: 900, fontSize: '0.75rem', letterSpacing: '1px' }}>RELAY PATH</div>
-                            <div style={{ color: '#fff', fontSize: '1.1rem', marginTop: '5px' }}>madhuram@sliet.ac.in</div>
+                            <div style={{ color: 'var(--pink)', fontWeight: 900, fontSize: '0.7rem', letterSpacing: '2px', marginBottom: '4px' }}>RELAY PATH</div>
+                            <div style={{ color: '#fff', fontSize: '1.12rem', fontWeight: 600 }}>madhuram@sliet.ac.in</div>
                         </div>
                     </div>
-                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '40px', textAlign: 'center' }}>
-                        <a href="https://instagram.com/madhuramsliet" style={{ color: '#fff', textDecoration: 'none', fontSize: '1.5rem', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '15px' }}>
-                            <Zap fill="var(--pink)" /> @madhuramsliet
+                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', marginTop: isMobile ? '10px' : '20px', paddingTop: '30px', textAlign: 'center' }}>
+                        <a href="https://instagram.com/madhuramsliet" style={{ color: '#fff', textDecoration: 'none', fontSize: '1.4rem', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '15px', color: '#ebff00' }}>
+                            <Zap fill="#ebff00" size={24} /> @madhuramsliet
                         </a>
                     </div>
                 </div>

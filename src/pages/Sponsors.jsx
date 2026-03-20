@@ -103,21 +103,44 @@ const Sponsors = () => {
             </motion.div>
 
             {/* MARQUEE */}
-            <div style={{ marginTop: '100px', width: '100vw', marginLeft: 'calc(-50vw + 50%)', background: 'var(--yellow)', padding: '15px 0', overflow: 'hidden' }}>
-                <motion.div animate={{ x: ["0%", "-50%"] }} transition={{ duration: 25, repeat: Infinity, ease: "linear" }} style={{ display: 'flex', whiteSpace: 'nowrap' }}>
-                    {[...Array(4)].map((_, i) => (
-                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '50px', paddingRight: '50px', color: '#000', fontWeight: 900, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '2px' }}>
-                            <span>📞 +91 7856893952</span>
-                            <span style={{ color: 'var(--pink)' }}>//</span>
-                            <span>📧 madhuram@sliet.ac.in</span>
-                            <span style={{ color: 'var(--pink)' }}>//</span>
-                            <span>📍 SLIET, PUNJAB</span>
-                            <span style={{ color: 'var(--pink)' }}>//</span>
-                            <span>MADHURAM '26 EXCLUSIVE</span>
-                        </div>
-                    ))}
-                </motion.div>
-            </div>
+            {!isMobile && (
+                <div style={{
+                    marginTop: '100px',
+                    width: '100vw',
+                    position: 'relative',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    background: '#000',
+                    borderTop: '1px solid rgba(252, 238, 10, 0.3)',
+                    borderBottom: '1px solid rgba(252, 238, 10, 0.3)',
+                    padding: '24px 0',
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap'
+                }}>
+                    <motion.div animate={{ x: ["0%", "-50%"] }} transition={{ duration: 35, repeat: Infinity, ease: "linear" }} style={{ display: 'inline-block', whiteSpace: 'nowrap' }}>
+                        {[...Array(6)].map((_, i) => (
+                            <span key={i} style={{ display: 'inline-block', whiteSpace: 'nowrap' }}>
+                                <span style={{ display: 'inline-block', color: 'var(--yellow)', fontWeight: 900, fontSize: '1.1rem', letterSpacing: '4px', padding: '0 60px', whiteSpace: 'nowrap' }}>
+                                    📞&nbsp;&nbsp;+91 7856893952
+                                </span>
+                                <span style={{ display: 'inline-block', color: 'var(--pink)', opacity: 0.5 }}>//</span>
+                                <span style={{ display: 'inline-block', color: 'var(--yellow)', fontWeight: 900, fontSize: '1.1rem', letterSpacing: '4px', padding: '0 60px' }}>
+                                    📧&nbsp;&nbsp;MADHURAM@SLIET.AC.IN
+                                </span>
+                                <span style={{ display: 'inline-block', color: 'var(--pink)', opacity: 0.5 }}>//</span>
+                                <span style={{ display: 'inline-block', color: 'var(--yellow)', fontWeight: 900, fontSize: '1.1rem', letterSpacing: '4px', padding: '0 60px' }}>
+                                    📍&nbsp;&nbsp;SLIET, PUNJAB
+                                </span>
+                                <span style={{ display: 'inline-block', color: 'var(--pink)', opacity: 0.5 }}>//</span>
+                                <span style={{ display: 'inline-block', color: '#fff', fontWeight: 900, fontSize: '1.1rem', letterSpacing: '4px', padding: '0 60px' }}>
+                                    MADHURAM '26 EXCLUSIVE
+                                </span>
+                                <span style={{ display: 'inline-block', color: 'var(--pink)', opacity: 0.5 }}>//</span>
+                            </span>
+                        ))}
+                    </motion.div>
+                </div>
+            )}
         </motion.div>
     );
 };

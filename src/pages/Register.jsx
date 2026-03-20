@@ -34,11 +34,18 @@ const RegistrationForm = ({ isSliet, onBack, initialEvent, isMobile }) => {
         try {
             const table = isSliet ? 'sliet_registrations' : 'non_sliet_registrations';
             
-            // Filter out fields not present in sliet_registrations schema
-            let dataToSubmit = { ...formData };
+            // STRICT FILTER: Only send fields confirmed in the schema to avoid cache errors
+            let dataToSubmit = {};
             if (isSliet) {
-                const { accommodation, payment_paid, college_name, ...filteredData } = dataToSubmit;
-                dataToSubmit = filteredData;
+                // Internal schema only expects these core fields
+                dataToSubmit = {
+                    name: formData.name,
+                    trade: formData.trade,
+                    event_name: formData.event_name,
+                    reg_no: formData.reg_no
+                };
+            } else {
+                dataToSubmit = { ...formData };
             }
 
             const { error } = await supabase.from(table).insert([dataToSubmit]);
@@ -113,10 +120,15 @@ const RegistrationForm = ({ isSliet, onBack, initialEvent, isMobile }) => {
                             <div style={{ fontSize: '0.7rem', fontWeight: 900, color: 'var(--pink)', letterSpacing: '2px', marginBottom: '10px' }}>FULL_NAME</div>
                             <input required name="name" value={formData.name} onChange={handleChange} style={inputStyle} placeholder="ENTER IDENTIFIER" />
                         </div>
-                        {!isSliet && (
+                        {!isSliet ? (
                             <div>
                                 <div style={{ fontSize: '0.7rem', fontWeight: 900, color: 'var(--pink)', letterSpacing: '2px', marginBottom: '10px' }}>COLLEGE_NODE</div>
                                 <input required name="college_name" value={formData.college_name} onChange={handleChange} style={inputStyle} placeholder="UNIVERSITY NAME" />
+                            </div>
+                        ) : (
+                            <div>
+                                <div style={{ fontSize: '0.7rem', fontWeight: 900, color: 'var(--pink)', letterSpacing: '2px', marginBottom: '10px' }}>TRADE / BRANCH</div>
+                                <input required name="trade" value={formData.trade} onChange={handleChange} style={inputStyle} placeholder="COURSE & BRANCH" />
                             </div>
                         )}
                         <div>
