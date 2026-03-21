@@ -6,6 +6,7 @@ const Footer = () => {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
     const [email, setEmail] = useState('');
     const [newsStatus, setNewsStatus] = useState('idle');
+    const [showSecret, setShowSecret] = useState(false);
 
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth < 1024);
@@ -17,7 +18,7 @@ const Footer = () => {
         e.preventDefault();
         if (!email) return;
         setNewsStatus('loading');
-        
+
         try {
             const { error } = await supabase.from('newsletters').insert([{ email }]);
             if (error) throw error;
@@ -74,11 +75,11 @@ const Footer = () => {
                     <div style={{ color: '#fff', fontSize: '0.9rem', fontWeight: 900, marginBottom: '24px', letterSpacing: '2px' }}>EXPLORE</div>
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         {[
-                            { label: 'Events',   path: '/events' },
+                            { label: 'Events', path: '/events' },
                             { label: 'Sponsors', path: '/sponsors' },
                             { label: 'Register', path: '/register' },
-                            { label: 'Team',     path: '/team' },
-                            { label: 'About',    path: '/about' },
+                            { label: 'Team', path: '/team' },
+                            { label: 'About', path: '/about' },
                         ].map(({ label, path }) => (
                             <li key={label}>
                                 <a
@@ -108,11 +109,11 @@ const Footer = () => {
                         </div>
                     ) : (
                         <form onSubmit={handleNewsletterSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            <input 
-                                type="email" 
+                            <input
+                                type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                placeholder="Enter your email" 
+                                placeholder="Enter your email"
                                 required
                                 style={{
                                     width: '100%', padding: '16px', borderRadius: '12px',
@@ -122,8 +123,8 @@ const Footer = () => {
                                 onFocus={e => e.target.style.borderColor = 'var(--pink)'}
                                 onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
                             />
-                            <button 
-                                type="submit" 
+                            <button
+                                type="submit"
                                 disabled={newsStatus === 'loading'}
                                 style={{
                                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%',
@@ -143,8 +144,12 @@ const Footer = () => {
             </div>
 
             <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', marginTop: '60px', paddingTop: '30px', textAlign: 'center' }}>
-                <div style={{ fontSize: '0.75rem', letterSpacing: '2px', color: 'rgba(255,255,255,0.3)', fontWeight: 700 }}>
-                    © 2026 MADHURAM SLIET // DEVELOPED BY <span style={{ color: 'var(--pink)' }}>STITCH_WORKS</span>
+                <div 
+                    onMouseEnter={() => setShowSecret(true)}
+                    onMouseLeave={() => setShowSecret(false)}
+                    style={{ fontSize: '0.75rem', letterSpacing: '2px', color: 'rgba(255,255,255,0.3)', fontWeight: 700, cursor: 'help', transition: '0.15s' }}
+                >
+                    © 2026 MADHURAM SLIET // {showSecret ? <span style={{ color: 'var(--cyan)' }}>HIDDEN BY THE MATRIX</span> : <span>DEVELOPED BY <span style={{ color: 'var(--pink)' }}>Aetherin</span></span>}
                 </div>
             </div>
         </footer>

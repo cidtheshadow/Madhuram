@@ -25,9 +25,9 @@ const Events = () => {
     }, [selectedEvent]);
 
     const topEvents = [
-        { title: "Bhangra Cup", desc: "The ultimate Bhangra showdown. High energy, pure tradition.", img: "https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?w=800&q=80", tag: "MAIN FEST" },
+        { title: "Bhangra Cup", desc: "The ultimate Bhangra showdown. High energy, pure tradition.", img: "/events/bhangra_cup.png", tag: "MAIN FEST" },
         { title: "Movie Show", desc: "Grab your popcorn and get ready for the big screen experience.", img: "/events/movie_show_1773481018872.png", tag: "PRE-EVENTS" },
-        { title: "Dance", desc: "Embrace the rich cultural tapestry through captivating folk dance.", img: "/events/dance_1773481189287.png", tag: "MAIN FEST" },
+        { title: "Dance", desc: "Embrace the rich cultural tapestry through captivating folk dance.", img: "/events/dance.png", tag: "MAIN FEST" },
         { title: "Singing", desc: "From soulful ballads to electrifying performances.", img: "/events/singing_1773481234846.png", tag: "MAIN FEST" },
         { title: "Band Performance", desc: "Step into the spotlight as bands unite to rock the stage.", img: "/events/band_performance_1773481251795.png", tag: "MAIN FEST" }
     ];
@@ -48,8 +48,8 @@ const Events = () => {
         { title: 'OPEN MIC', desc: 'A stage for every voice and a spotlight for every story. Share your poetry, comedy, music, or spoken word — no filters, just raw expression.', tag: 'PRE-EVENTS', img: '/events/open_mic_1773481123321.png', active: false },
         { title: 'SLIET ROADIES', desc: 'Strength, stamina, and fearless determination. Navigate through gruelling challenges designed to test your physical and mental limits in this epic adventure.', tag: 'PRE-EVENTS', img: '/events/sliet_roadies_1773481148722.png', active: false },
         { title: 'FLASHMOB', desc: 'When the music drops, the crowd becomes the stage. A surprise burst of choreographed energy in the most unexpected places — join in or be amazed.', tag: 'PRE-EVENTS', img: '/events/flashmob_1773481168223.png', active: false },
-        { title: 'BHANGRA CUP', desc: 'The ultimate Bhangra showdown. High energy, pure tradition, thunderous beats and vibrant moves — experience the true spirit of Punjab on the grandest stage.', tag: 'MAIN FEST', img: 'https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?w=800&q=80', active: true },
-        { title: 'DANCE', desc: 'Embrace the rich cultural tapestry through captivating folk dance. From classical to contemporary, every step tells a story of tradition, passion, and artistry.', tag: 'MAIN FEST', img: '/events/dance_1773481189287.png', active: false },
+        { title: 'BHANGRA CUP', desc: 'The ultimate Bhangra showdown. High energy, pure tradition, thunderous beats and vibrant moves — experience the true spirit of Punjab on the grandest stage.', tag: 'MAIN FEST', img: '/events/bhangra_cup.png', active: true },
+        { title: 'DANCE', desc: 'Embrace the rich cultural tapestry through captivating folk dance. From classical to contemporary, every step tells a story of tradition, passion, and artistry.', tag: 'MAIN FEST', img: '/events/dance.png', active: false },
         { title: 'SINGING', desc: 'From soulful ballads to electrifying performances. Step up to the mic and let your voice echo through the crowd in this celebration of musical excellence.', tag: 'MAIN FEST', img: '/events/singing_1773481234846.png', active: false },
         { title: 'BAND PERFORMANCE', desc: 'Step into the spotlight as bands unite to rock the stage. Original compositions, cover acts, and raw talent — this is where music legends are born.', tag: 'MAIN FEST', img: '/events/band_performance_1773481251795.png', active: false },
         { title: 'DRAMA / SKIT', desc: 'Prepare for an evening of storytelling and creativity. Powerful performances that blur the line between stage and reality, leaving the audience breathless.', tag: 'MAIN FEST', img: '/events/drama_skit_1773481272190.png', active: false },
@@ -344,7 +344,18 @@ const Events = () => {
                             </motion.div>
                         )) : (
                             <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '100px 0' }}>
-                                <h2 style={{ color: 'var(--text-muted)', fontSize: '1.5rem' }}>No sequences found matching your query.</h2>
+                                <h2 style={{ color: 'var(--text-muted)', fontSize: '1.5rem' }}>
+                                    {(() => {
+                                        const query = searchQuery.toLowerCase().trim();
+                                        if (query === 'suman') return 'Perfect';
+                                        if (query === 'tanush') return 'The Architect';
+                                        if (query === 'madhuram') return 'The Era of Euphoria';
+                                        if (query === 'sliet') return 'Green Campus, Great Minds';
+                                        if (query === 'shubham') return 'The Best Man';
+                                        if (query === 'love') return 'Madhuram is Love ♥';
+                                        return 'No sequences found matching your query.';
+                                    })()}
+                                </h2>
                             </div>
                         )}
                     </AnimatePresence>

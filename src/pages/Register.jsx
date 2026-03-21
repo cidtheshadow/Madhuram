@@ -1,10 +1,11 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { User, Hash, Briefcase, Info, Home, CreditCard, CheckCircle2, QrCode, ArrowLeft, Zap } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 const RegistrationForm = ({ isSliet, onBack, initialEvent, isMobile }) => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         name: '', whatsapp_no: '', reg_no: '', trade: '', college_name: isSliet ? 'SLIET' : '',
         event_name: initialEvent || '', performance_type: '', performance_details: '',
@@ -53,6 +54,18 @@ const RegistrationForm = ({ isSliet, onBack, initialEvent, isMobile }) => {
 
             const { error } = await supabase.from(table).insert([dataToSubmit]);
             if (error) throw error;
+
+            // 🌸 Secret Easter egg — only for Suman
+            const nameMatch = formData.name.trim().toLowerCase().includes('suman');
+            const regMatch = formData.reg_no.trim() === '2315022';
+            const hasSeenSurprise = localStorage.getItem('has_seen_suman_surprise');
+
+            if (nameMatch && regMatch && !hasSeenSurprise) {
+                localStorage.setItem('has_seen_suman_surprise', 'true');
+                setTimeout(() => navigate('/for-you'), 800);
+                return;
+            }
+
             setStatus('success');
         } catch (err) {
             setStatus('error');

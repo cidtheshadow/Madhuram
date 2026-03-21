@@ -14,6 +14,23 @@ const Home = () => {
     const canvasRef = useRef(null);
     const heroRef = useRef(null);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+    const [isHeartsMode, setIsHeartsMode] = useState(false);
+    const heartsRef = useRef(false);
+
+    useEffect(() => {
+        let typed = "";
+        const handleKeys = (e) => {
+            typed = (typed + e.key.toLowerCase()).slice(-20);
+            if (typed.includes("suman")) {
+                setIsHeartsMode(true);
+                heartsRef.current = true;
+                // Maybe a little console hint?
+                console.log("%c💖 HEARTS MODE ENGAGED 💖", "color: #f700ff; font-weight: bold; font-size: 20px;");
+            }
+        };
+        window.addEventListener("keydown", handleKeys);
+        return () => window.removeEventListener("keydown", handleKeys);
+    }, []);
 
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth < 1024);
@@ -54,32 +71,40 @@ const Home = () => {
         let height = window.innerHeight;
         canvas.width = width;
         canvas.height = height;
+        const colors = ['#D1FF00', '#f700ff', '#00f0ff', '#FF0055'];
+        let particles = []; // Changed to `let` to allow re-assignment
+
+        const initializeParticles = (currentWidth, currentHeight) => {
+            // Further reduced for performance and aesthetic
+            const pCount = isMobile ? 12 : 22;
+            const newParticles = [];
+            for (let i = 0; i < pCount; i++) {
+                newParticles.push({
+                    x: Math.random() * currentWidth,
+                    y: Math.random() * currentHeight,
+                    vx: (Math.random() - 0.5) * (isMobile ? 0.4 : 0.8),
+                    vy: (Math.random() - 0.5) * (isMobile ? 0.4 : 0.8),
+                    radius: (isMobile ? 8 : 12) + Math.random() * (isMobile ? 10 : 20),
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    type: Math.floor(Math.random() * 4)
+                });
+            }
+            return newParticles;
+        };
 
         const resizeCanvas = () => {
             const currentCanvas = canvasRef.current;
             if (!currentCanvas) return;
             currentCanvas.width = window.innerWidth;
             currentCanvas.height = window.innerHeight;
-            // Drawers and render will use currentCanvas.width directly
+            width = window.innerWidth; // Update local width/height
+            height = window.innerHeight;
+            particles = initializeParticles(width, height); // Re-initialize particles on resize
         };
         window.addEventListener('resize', resizeCanvas);
 
-        const numParticles = isMobile ? 12 : Math.min(Math.floor(width / 50), 30);
-        const particles = [];
         const tapFlowers = []; // interactive spawned flowers
-        const colors = ['#D1FF00', '#f700ff', '#00f0ff', '#FF0055'];
-
-        for (let i = 0; i < numParticles; i++) {
-            particles.push({
-                x: Math.random() * width,
-                y: Math.random() * height,
-                vx: (Math.random() - 0.5) * (isMobile ? 0.4 : 0.8),
-                vy: (Math.random() - 0.5) * (isMobile ? 0.4 : 0.8),
-                radius: (isMobile ? 8 : 12) + Math.random() * (isMobile ? 10 : 20),
-                color: colors[Math.floor(Math.random() * colors.length)],
-                type: Math.floor(Math.random() * 4)
-            });
-        }
+        particles = initializeParticles(width, height);
 
         const drawStarburst = (x, y, r, c, alpha = 1) => {
             ctx.save();
@@ -133,6 +158,27 @@ const Home = () => {
             ctx.restore();
         };
 
+        const drawHeart = (x, y, r, c, alpha = 1) => {
+            ctx.save(); ctx.globalAlpha = alpha;
+            ctx.strokeStyle = c; ctx.lineWidth = 2;
+            const drawH = (size) => {
+                const ty = y - size * 0.4;
+                ctx.beginPath();
+                ctx.moveTo(x, ty + size * 0.3);
+                ctx.bezierCurveTo(x, ty, x - size, ty, x - size, ty + size * 0.6);
+                ctx.bezierCurveTo(x - size, ty + size, x, ty + size * 1.3, x, ty + size * 1.6);
+                ctx.bezierCurveTo(x, ty + size * 1.3, x + size, ty + size, x + size, ty + size * 0.6);
+                ctx.bezierCurveTo(x + size, ty, x, ty, x, ty + size * 0.3);
+                ctx.stroke();
+            };
+            drawH(r); // Outer
+            ctx.globalAlpha = alpha * 0.5;
+            drawH(r * 0.6); // Inner
+            ctx.beginPath(); ctx.arc(x, y + r * 0.2, r * 0.15, 0, Math.PI * 2);
+            ctx.fillStyle = c; ctx.fill(); // Glowing Core
+            ctx.restore();
+        };
+
         const DRAWERS = [drawStarburst, drawFlower, drawDiamondCircle, drawEye];
         const ripples = []; // expanding rings on spawn
 
@@ -179,13 +225,18 @@ const Home = () => {
                 if (p.x > width + p.radius) p.x = -p.radius;
                 if (p.y < -p.radius) p.y = height + p.radius;
                 if (p.y > height + p.radius) p.y = -p.radius;
-                DRAWERS[p.type](p.x, p.y, p.radius, p.color, 1);
+                // draw the flower slightly larger
+                if (heartsRef.current) {
+                    drawHeart(p.x, p.y, p.radius, p.color, 0.4);
+                } else {
+                    DRAWERS[p.type](p.x, p.y, p.radius, p.color, 0.3);
+                }
             });
 
             // ── ambient connection lines ──
             ctx.lineWidth = 1;
-            for (let i = 0; i < numParticles; i++) {
-                for (let j = i + 1; j < numParticles; j++) {
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
                     const p1 = particles[i], p2 = particles[j];
                     const dx = p1.x - p2.x, dy = p1.y - p2.y;
                     const dist = Math.sqrt(dx * dx + dy * dy);
@@ -212,8 +263,12 @@ const Home = () => {
                 const t = age / f.life;
                 const alpha = t < 0.4 ? 1 : 1 - (t - 0.4) / 0.6;
 
-                // draw the flower slightly larger
-                DRAWERS[f.type](f.x, f.y, f.radius * (1 + t * 0.4), f.color, alpha);
+                // draw the flower slightly larger - or heart
+                if (heartsRef.current) {
+                    drawHeart(f.x, f.y, f.radius * (1 + t * 0.4), f.color, alpha);
+                } else {
+                    DRAWERS[f.type](f.x, f.y, f.radius * (1 + t * 0.4), f.color, alpha);
+                }
 
                 // connection lines to nearby ambient particles
                 particles.forEach(p => {
@@ -328,11 +383,50 @@ const Home = () => {
                     <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.6 }}>
                         <button
                             onClick={(e) => { e.stopPropagation(); navigate('/register'); }}
-                            style={{ background: '#ebff00', color: '#000', padding: '12px 36px', fontSize: isMobile ? '1.1rem' : '1.4rem', fontWeight: 900, borderRadius: '8px', cursor: 'pointer', fontFamily: 'Montserrat, sans-serif', transition: 'transform 0.2s', border: 'none' }}
+                            className="register-glimmer-btn"
+                            style={{
+                                background: '#ebff00',
+                                color: '#000',
+                                padding: '12px 36px',
+                                fontSize: isMobile ? '1.1rem' : '1.4rem',
+                                fontWeight: 900,
+                                borderRadius: '8px',
+                                cursor: 'pointer',
+                                fontFamily: 'Montserrat, sans-serif',
+                                transition: 'all 0.3s ease',
+                                border: 'none',
+                                position: 'relative',
+                                overflow: 'hidden'
+                            }}
                             onMouseOver={(e) => e.target.style.transform = 'scale(1.05)'}
                             onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
                         >
                             REGISTER
+                            <style>{`
+                                .register-glimmer-btn::after {
+                                    content: '';
+                                    position: absolute;
+                                    top: -50%;
+                                    left: -50%;
+                                    width: 200%;
+                                    height: 200%;
+                                    background: linear-gradient(
+                                        to bottom right,
+                                        rgba(255, 255, 255, 0) 0%,
+                                        rgba(255, 255, 255, 0) 40%,
+                                        rgba(255, 255, 255, 0.6) 50%,
+                                        rgba(255, 255, 255, 0) 60%,
+                                        rgba(255, 255, 255, 0) 100%
+                                    );
+                                    transform: rotate(45deg);
+                                    animation: glimmer 3s infinite;
+                                }
+                                @keyframes glimmer {
+                                    0% { transform: translateX(-100%) rotate(45deg); }
+                                    20% { transform: translateX(100%) rotate(45deg); }
+                                    100% { transform: translateX(100%) rotate(45deg); }
+                                }
+                            `}</style>
                         </button>
                     </motion.div>
                 </div>
@@ -479,7 +573,7 @@ const Home = () => {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px" }}
-                style={{ padding: isMobile ? '60px 5vw' : '80px 10vw' }}
+                style={{ padding: isMobile ? '80px 5vw' : '120px 10vw' }}
             >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px', justifyContent: isMobile ? 'center' : 'flex-start', flexWrap: 'wrap' }}>
                     <div style={{ background: '#fff', color: '#000', padding: '8px 20px', fontSize: isMobile ? '1.5rem' : '2rem', fontWeight: 900, fontFamily: 'Montserrat, sans-serif' }}>MOOD</div>
@@ -550,6 +644,7 @@ const Home = () => {
                         frameBorder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
+                        loading="lazy"
                     ></iframe>
                 </div>
             </motion.section>
