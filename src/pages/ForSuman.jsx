@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -8,7 +8,8 @@ const SONG_ID = 'fk_KvUijS8M';
 const ForSuman = () => {
     const canvasRef = useRef(null);
     const navigate = useNavigate();
-    const [phase, setPhase] = useState(0); // 0: initial, 1: message
+    const [phase, setPhase] = useState(-1); // -1: lock screen, 0: initial, 1: message
+
     const location = useLocation();
 
     const [isMobileScreen, setIsMobileScreen] = useState(window.innerWidth < 1024);
@@ -137,13 +138,15 @@ const ForSuman = () => {
         return () => { cancelAnimationFrame(frame); window.removeEventListener('resize', onResize); };
     }, []);
 
-    // Auto-advance to full message
+    // Auto-advance to full message ONLY AFTER interaction occurs (phase 0 -> 1)
     useEffect(() => {
-        const t = setTimeout(() => {
-            setPhase(1);
-        }, 3500); // 3.5s delay before message reveal
-        return () => clearTimeout(t);
-    }, []);
+        if (phase === 0) {
+            const t = setTimeout(() => {
+                setPhase(1);
+            }, 3500); // 3.5s delay before message reveal
+            return () => clearTimeout(t);
+        }
+    }, [phase]);
 
     return (
         <div style={{
@@ -196,11 +199,95 @@ const ForSuman = () => {
             {/* Content */}
             <div style={{ position: 'relative', zIndex: 2, maxWidth: '720px', textAlign: 'center' }}>
 
+                {/* Phase -1: Interaction Lock for Autoplay */}
+                <AnimatePresence>
+                    {phase === -1 && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0, filter: 'blur(10px)' }}
+                            transition={{ duration: 1 }}
+                            style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}
+                        >
+                            <motion.div
+                                animate={{ boxShadow: ['0 0 20px rgba(247,0,255,0.2)', '0 0 60px rgba(247,0,255,0.6)', '0 0 20px rgba(247,0,255,0.2)'] }}
+                                transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                                style={{
+                                    borderRadius: '50%',
+                                    padding: '4px',
+                                    background: 'linear-gradient(135deg, rgba(247,0,255,0.5), rgba(0,240,255,0.5))',
+                                    marginBottom: '30px',
+                                    cursor: 'pointer'
+                                }}
+                                onClick={() => setPhase(0)}
+                            >
+                                <motion.div
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    style={{
+                                        background: 'rgba(10, 0, 15, 0.9)',
+                                        width: '80px',
+                                        height: '80px',
+                                        borderRadius: '50%',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        backdropFilter: 'blur(10px)',
+                                    }}
+                                >
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="url(#gradient)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <defs>
+                                            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                <stop offset="0%" stopColor="#f700ff" />
+                                                <stop offset="100%" stopColor="#ff69b4" />
+                                            </linearGradient>
+                                        </defs>
+                                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                    </svg>
+                                </motion.div>
+                            </motion.div>
+
+                            <motion.h2 
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.3 }}
+                                style={{
+                                    color: '#fff',
+                                    fontSize: '1.2rem',
+                                    fontFamily: 'Montserrat, sans-serif',
+                                    fontWeight: 300,
+                                    letterSpacing: '4px',
+                                    textTransform: 'uppercase',
+                                    margin: '0 0 8px 0'
+                                }}
+                            >
+                                Tap to Unlock
+                            </motion.h2>
+                            
+                            <motion.p
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.6 }}
+                                style={{
+                                    color: 'rgba(255,255,255,0.4)',
+                                    fontSize: '0.8rem',
+                                    letterSpacing: '2px',
+                                    textTransform: 'uppercase',
+                                    fontFamily: 'Montserrat, sans-serif'
+                                }}
+                            >
+                                Sound On
+                            </motion.p>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
                 {/* Phase 0: Surprise reveal */}
                 <motion.div
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={{ opacity: phase >= 0 ? 1 : 0, scale: phase >= 0 ? 1 : 0.5 }}
                     transition={{ type: 'spring', stiffness: 180, damping: 18 }}
+                    style={{ pointerEvents: phase >= 0 ? 'auto' : 'none' }}
                 >
                     {/* Heart emoji giant */}
                     <motion.div
