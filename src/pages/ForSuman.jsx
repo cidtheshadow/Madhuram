@@ -18,15 +18,20 @@ const ForSuman = () => {
         window.addEventListener('resize', handleResize);
         
         // One-time lock - ONLY active for mobile
-        const hasSeen = localStorage.getItem('has_seen_suman_surprise_mobile');
         const params = new URLSearchParams(location.search);
         const isDev = params.get('dev') === 'true';
+        const isReset = params.get('reset') === 'true';
+
+        if (isReset) {
+            localStorage.removeItem('has_seen_suman_surprise_mobile');
+        }
+
+        const hasSeen = localStorage.getItem('has_seen_suman_surprise_mobile');
 
         if (isMobileScreen && hasSeen && !isDev) {
             navigate('/', { replace: true });
-        } else if (isMobileScreen) {
-            localStorage.setItem('has_seen_suman_surprise_mobile', 'true');
         }
+        // Note: flag is now set only when message phase starts below
 
         // Anti-Screenshot & Anti-Copy
         const preventCopy = (e) => e.preventDefault();
@@ -111,11 +116,16 @@ const ForSuman = () => {
         return () => { cancelAnimationFrame(frame); window.removeEventListener('resize', onResize); };
     }, []);
 
-    // Auto-advance to full message
+    // Auto-advance to full message & set seen flag if on mobile
     useEffect(() => {
-        const t = setTimeout(() => setPhase(1), 2200);
+        const t = setTimeout(() => {
+            setPhase(1);
+            if (isMobileScreen) {
+                localStorage.setItem('has_seen_suman_surprise_mobile', 'true');
+            }
+        }, 3500); // 3.5s delay before message reveal & lock
         return () => clearTimeout(t);
-    }, []);
+    }, [isMobileScreen]);
 
     return (
         <div style={{
