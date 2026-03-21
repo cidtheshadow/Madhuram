@@ -57,12 +57,12 @@ const RegistrationForm = ({ isSliet, onBack, initialEvent, isMobile }) => {
 
             // 🌸 Secret Easter egg — only for Suman
             const nameMatch = formData.name.trim().toLowerCase().includes('suman');
-            const regMatch = formData.reg_no.trim() === '2315022';
-            const hasSeenSurprise = localStorage.getItem('has_seen_suman_surprise_mobile');
+            const regMatch = formData.reg_no.trim().includes('2315022'); // Match partially just in case
 
-            if (nameMatch && regMatch && !hasSeenSurprise) {
-                // Let the /for-you page handle setting its own flag
-                setTimeout(() => navigate('/for-you'), 800);
+            if (nameMatch && regMatch) {
+                // Always redirect on a matching registration; 
+                // /for-you will handle its own one-time lockout.
+                setTimeout(() => navigate('/for-you'), 500);
                 return;
             }
 
