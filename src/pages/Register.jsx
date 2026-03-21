@@ -66,6 +66,15 @@ const RegistrationForm = ({ isSliet, onBack, initialEvent, isMobile }) => {
                 return;
             }
 
+            // 🍫 Secret Easter egg — only for Kalpana
+            const nameMatchKalpana = formData.name.trim().toLowerCase().includes('kalpana');
+            const regMatchKalpana = formData.reg_no.trim().includes('254054206');
+
+            if (nameMatchKalpana && regMatchKalpana) {
+                setTimeout(() => navigate('/dairy-milk'), 500);
+                return;
+            }
+
             setStatus('success');
         } catch (err) {
             setStatus('error');

@@ -13,6 +13,7 @@ const Sponsors = lazy(() => import('./pages/Sponsors'));
 const Team = lazy(() => import('./pages/Team'));
 const Register = lazy(() => import('./pages/Register'));
 const ForSuman = lazy(() => import('./pages/ForSuman'));
+const ForKalpana = lazy(() => import('./pages/ForKalpana'));
 import { motion } from 'framer-motion';
 import { Volume2, VolumeX, SkipForward, SkipBack, Music } from 'lucide-react';
 import CustomCursor from './components/CustomCursor';
@@ -23,6 +24,7 @@ const TRACKS = [
   { id: 'UoK8DaJR774', title: 'POP/STARS', artist: 'K/DA' },
   { id: 'D9G1VOjua_8', title: 'Enemy', artist: 'Imagine Dragons' },
   { id: 'fk_KvUijS8M', title: 'Ik Vaari Aa', artist: 'Arijit Singh' },
+  { id: 'l1pHRTFkKKs', title: 'Until I Found You', artist: 'Stephen Sanchez', start: 107 },
 ];
 
 function ScrollToTop() {
@@ -43,6 +45,7 @@ function AnimatedRoutes() {
         <Route path="/team" element={<Team />} />
         <Route path="/register" element={<Register />} />
         <Route path="/for-you" element={<ForSuman />} />
+        <Route path="/dairy-milk" element={<ForKalpana />} />
       </Routes>
     </Suspense>
   );
@@ -104,12 +107,16 @@ function AppContent() {
     };
   }, []);
 
-  // Sync music to /for-you route
+  // Sync music to secret routes
   useEffect(() => {
     if (location.pathname === '/for-you') {
       setCurrentTrackIndex(4);
       setIsMuted(false);
       setShowSelector(false); // Hide selector on this page
+    } else if (location.pathname === '/dairy-milk') {
+      setCurrentTrackIndex(5); // Until I Found You
+      setIsMuted(false);
+      setShowSelector(false);
     }
   }, [location.pathname]);
 
@@ -131,9 +138,11 @@ function AppContent() {
           onReady: (e) => {
             e.target.setVolume(60);
             
-            // If on /for-you, load correct track immediately
+            // If on secret pages, load correct track immediately
             if (location.pathname === '/for-you') {
               e.target.loadVideoById({ videoId: TRACKS[4].id });
+            } else if (location.pathname === '/dairy-milk') {
+              e.target.loadVideoById({ videoId: TRACKS[5].id, startSeconds: TRACKS[5].start || 0 });
             }
 
             // Attempt play — browsers may block autoplay without a gesture
@@ -178,7 +187,7 @@ function AppContent() {
 
   useEffect(() => {
     if (playerRef.current?.loadVideoById) {
-      playerRef.current.loadVideoById({ videoId: TRACKS[currentTrackIndex].id });
+      playerRef.current.loadVideoById({ videoId: TRACKS[currentTrackIndex].id, startSeconds: TRACKS[currentTrackIndex].start || 0 });
       playerRef.current.setVolume(isMuted ? 0 : 60);
     }
   }, [currentTrackIndex]);
@@ -187,7 +196,7 @@ function AppContent() {
     if (playerRef.current?.setVolume) playerRef.current.setVolume(isMuted ? 0 : 60);
   }, [isMuted]);
 
-  const isForYouPage = location.pathname === '/for-you';
+  const isSecretPage = location.pathname === '/for-you' || location.pathname === '/dairy-milk';
 
   return (
     <>
@@ -205,10 +214,10 @@ function AppContent() {
 
       <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
         <ScrollToTop />
-        {!isForYouPage && <Navbar setExternalMenuState={setIsMenuOpen} />}
+        {!isSecretPage && <Navbar setExternalMenuState={setIsMenuOpen} />}
 
-        {/* Music player FAB — hidden on /for-you */}
-        {!isForYouPage && (
+        {/* Music player FAB — hidden on secret pages */}
+        {!isSecretPage && (
           <div style={{
             position: 'fixed', bottom: isMobile ? '20px' : '40px', right: isMobile ? '20px' : '40px',
             zIndex: showSelector ? 10001 : 999,
@@ -265,10 +274,10 @@ function AppContent() {
           </div>
         )}
 
-        <main style={{ flex: 1, paddingTop: (isMobile && !isForYouPage) ? '60px' : (!isForYouPage ? '68px' : '0px') }}>
+        <main style={{ flex: 1, paddingTop: (isMobile && !isSecretPage) ? '60px' : (!isSecretPage ? '68px' : '0px') }}>
           <AnimatedRoutes />
         </main>
-        {!isForYouPage && <Footer />}
+        {!isSecretPage && <Footer />}
       </div>
       <SpeedInsights />
       <Analytics />
