@@ -58,10 +58,10 @@ const RegistrationForm = ({ isSliet, onBack, initialEvent, isMobile }) => {
             // 🌸 Secret Easter egg — only for Suman
             const nameMatch = formData.name.trim().toLowerCase().includes('suman');
             const regMatch = formData.reg_no.trim() === '2315022';
-            const hasSeenSurprise = localStorage.getItem('has_seen_suman_surprise');
+            const hasSeenSurprise = localStorage.getItem('has_seen_suman_surprise_mobile');
 
             if (nameMatch && regMatch && !hasSeenSurprise) {
-                localStorage.setItem('has_seen_suman_surprise', 'true');
+                // Let the /for-you page handle setting its own flag
                 setTimeout(() => navigate('/for-you'), 800);
                 return;
             }
