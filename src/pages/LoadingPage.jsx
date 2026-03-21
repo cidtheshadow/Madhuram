@@ -109,7 +109,7 @@ const LoadingPage = ({ onFinish }) => {
         window.addEventListener('resize', handleResize);
 
         const DURATION = 3000; // ms
-        const INTERVAL = 30;  // ms
+        const INTERVAL = 60;  // ms
         const STEPS = DURATION / INTERVAL;
         let current = 0;
 

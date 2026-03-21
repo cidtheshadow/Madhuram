@@ -33,9 +33,19 @@
     <!-- Preload the massive Hero background (LCP candidate) -->
     <link rel="preload" as="image" href="https://i.ibb.co/r2VjGb6B/DSC-4435.jpg" fetchpriority="high">
     
+    <!-- Preload fonts to improve FCP and reduce CLS -->
     <link
+        rel="preload"
         href="https://fonts.googleapis.com/css2?family=VT323&family=Jersey+10&family=Press+Start+2P&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Mystery+Quest&display=swap"
-        rel="stylesheet">
+        as="style"
+        onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript>
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=VT323&family=Jersey+10&family=Press+Start+2P&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Mystery+Quest&display=swap"
+        />
+    </noscript>
 </head>
 
 <body>

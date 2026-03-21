@@ -2,16 +2,17 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import LoadingPage from './pages/LoadingPage';
-import Home from './pages/Home';
-import About from './pages/About';
-import Events from './pages/Events';
-import Sponsors from './pages/Sponsors';
-import Team from './pages/Team';
+import { lazy, Suspense, useState, useEffect, useRef } from 'react';
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { Analytics } from "@vercel/analytics/react";
-import Register from './pages/Register';
-import ForSuman from './pages/ForSuman';
-import { useState, useEffect, useRef } from 'react';
+
+const Home = lazy(() => import('./pages/Home'));
+const About = lazy(() => import('./pages/About'));
+const Events = lazy(() => import('./pages/Events'));
+const Sponsors = lazy(() => import('./pages/Sponsors'));
+const Team = lazy(() => import('./pages/Team'));
+const Register = lazy(() => import('./pages/Register'));
+const ForSuman = lazy(() => import('./pages/ForSuman'));
 import { motion } from 'framer-motion';
 import { Volume2, VolumeX, SkipForward, SkipBack, Music } from 'lucide-react';
 import CustomCursor from './components/CustomCursor';
@@ -33,15 +34,17 @@ function ScrollToTop() {
 function AnimatedRoutes() {
   const location = useLocation();
   return (
-    <Routes location={location} key={location.pathname}>
-      <Route path="/" element={<Home />} />
-      <Route path="/about" element={<About />} />
-      <Route path="/events" element={<Events />} />
-      <Route path="/sponsors" element={<Sponsors />} />
-      <Route path="/team" element={<Team />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/for-you" element={<ForSuman />} />
-    </Routes>
+    <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f700ff', fontSize: '1.2rem', fontFamily: 'monospace' }}>LOADING SYSTEM...</div>}>
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/events" element={<Events />} />
+        <Route path="/sponsors" element={<Sponsors />} />
+        <Route path="/team" element={<Team />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/for-you" element={<ForSuman />} />
+      </Routes>
+    </Suspense>
   );
 }
 
@@ -155,16 +158,22 @@ function AppContent() {
       });
     };
 
-    if (!window.YT) {
-      const tag = document.createElement('script');
-      tag.src = 'https://www.youtube.com/iframe_api';
-      document.head.appendChild(tag);
-      window.onYouTubeIframeAPIReady = initPlayer;
-    } else if (window.YT.Player) {
-      initPlayer();
-    } else {
-      window.onYouTubeIframeAPIReady = initPlayer;
-    }
+    const loadYT = () => {
+      if (!window.YT) {
+        const tag = document.createElement('script');
+        tag.src = 'https://www.youtube.com/iframe_api';
+        document.head.appendChild(tag);
+        window.onYouTubeIframeAPIReady = initPlayer;
+      } else if (window.YT.Player) {
+        initPlayer();
+      } else {
+        window.onYouTubeIframeAPIReady = initPlayer;
+      }
+    };
+
+    // Delay YouTube loading to prevent main thread blocking during initial render
+    const tm = setTimeout(loadYT, 3000);
+    return () => clearTimeout(tm);
   }, []);
 
   useEffect(() => {

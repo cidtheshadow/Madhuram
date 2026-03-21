@@ -76,7 +76,7 @@ const Home = () => {
 
         const initializeParticles = (currentWidth, currentHeight) => {
             // Further reduced for performance and aesthetic
-            const pCount = isMobile ? 12 : 22;
+            const pCount = isMobile ? 5 : 22;
             const newParticles = [];
             for (let i = 0; i < pCount; i++) {
                 newParticles.push({
@@ -564,7 +564,7 @@ const Home = () => {
                     zIndex: 4,
                     pointerEvents: 'none'
                 }}>
-                    <img src={borderCloud} alt="Cloud Border" style={{ width: '100%', height: 'auto', maxHeight: isMobile ? '135px' : '480px', objectFit: 'fill', display: 'block' }} />
+                    <img src={borderCloud} alt="Cloud Border" loading="lazy" style={{ width: '100%', height: 'auto', maxHeight: isMobile ? '135px' : '480px', objectFit: 'fill', display: 'block' }} />
                 </div>
             </motion.section>
 

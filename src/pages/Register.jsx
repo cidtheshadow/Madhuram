@@ -34,7 +34,7 @@ const RegistrationForm = ({ isSliet, onBack, initialEvent, isMobile }) => {
         }
         try {
             const table = isSliet ? 'sliet_registrations' : 'non_sliet_registrations';
-            
+
             // STRICT FILTER: Only send fields confirmed in the schema to avoid cache errors
             let dataToSubmit = {};
             if (isSliet) {
@@ -107,7 +107,7 @@ const RegistrationForm = ({ isSliet, onBack, initialEvent, isMobile }) => {
 
                     {/* WhatsApp CTA — only shown after form is submitted */}
                     <motion.a
-                        href="https://chat.whatsapp.com/YOUR_GROUP_LINK"
+                        href="https://chat.whatsapp.com/FKjSeqO7IZABTiQpkVvuBG?mode=gi_t"
                         target="_blank"
                         rel="noreferrer"
                         initial={{ opacity: 0, y: 16 }}
