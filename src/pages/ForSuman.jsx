@@ -11,18 +11,47 @@ const ForSuman = () => {
     const [phase, setPhase] = useState(0); // 0: initial, 1: message
     const location = useLocation();
 
-    // Mark as seen once opened & restrict to one-time only
-    useEffect(() => {
-        const hasSeen = localStorage.getItem('has_seen_suman_surprise');
-        const params = new URLSearchParams(location.search);
-        const isBypass = params.get('bypass') === 'true' || params.get('dev') === 'true';
+    const [isMobileScreen, setIsMobileScreen] = useState(window.innerWidth < 1024);
 
-        if (hasSeen && !isBypass) {
+    useEffect(() => {
+        const handleResize = () => setIsMobileScreen(window.innerWidth < 1024);
+        window.addEventListener('resize', handleResize);
+        
+        // One-time lock - ONLY active for mobile
+        const hasSeen = localStorage.getItem('has_seen_suman_surprise_mobile');
+        const params = new URLSearchParams(location.search);
+        const isDev = params.get('dev') === 'true';
+
+        if (isMobileScreen && hasSeen && !isDev) {
             navigate('/', { replace: true });
-        } else {
-            localStorage.setItem('has_seen_suman_surprise', 'true');
+        } else if (isMobileScreen) {
+            localStorage.setItem('has_seen_suman_surprise_mobile', 'true');
         }
-    }, [navigate, location]);
+
+        // Anti-Screenshot & Anti-Copy
+        const preventCopy = (e) => e.preventDefault();
+        document.addEventListener('contextmenu', preventCopy);
+        document.addEventListener('copy', preventCopy);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            document.removeEventListener('contextmenu', preventCopy);
+            document.removeEventListener('copy', preventCopy);
+        };
+    }, [navigate, location, isMobileScreen]);
+
+    // Focus Lock for Screenshot Prevention
+    const [pageBlur, setPageBlur] = useState(false);
+    useEffect(() => {
+        const hBlur = () => setPageBlur(true);
+        const hFocus = () => setPageBlur(false);
+        window.addEventListener('blur', hBlur);
+        window.addEventListener('focus', hFocus);
+        return () => {
+            window.removeEventListener('blur', hBlur);
+            window.removeEventListener('focus', hFocus);
+        };
+    }, []);
 
     // Floating hearts canvas
     useEffect(() => {
@@ -100,7 +129,15 @@ const ForSuman = () => {
             position: 'relative',
             fontFamily: 'Montserrat, sans-serif',
             padding: '40px 20px',
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
+            filter: pageBlur ? 'blur(40px) contrast(0.5)' : 'none',
+            transition: 'filter 0.3s'
         }}>
+            {/* Print protection */}
+            <style>{`
+                @media print { body { display: none !important; } }
+            `}</style>
             {/* 🎵 Hidden autoplay player  Ik Vaari Aa */}
             {/* Floating hearts canvas */}
             <canvas ref={canvasRef} style={{ position: 'fixed', top: 0, left: 0, pointerEvents: 'none', zIndex: 0 }} />
