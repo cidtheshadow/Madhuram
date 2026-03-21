@@ -13,50 +13,71 @@ const ForSuman = () => {
 
     const [isMobileScreen, setIsMobileScreen] = useState(window.innerWidth < 1024);
 
+    const [pageBlur, setPageBlur] = useState(false);
+
     useEffect(() => {
         const handleResize = () => setIsMobileScreen(window.innerWidth < 1024);
         window.addEventListener('resize', handleResize);
         
-        // One-time lock - ONLY active for mobile
+        // --- DEADLINE LOGIC ---
+        // March 22, 2026 at 11:50 PM
+        const deadline = new Date('2026-03-22T23:50:00');
+        const now = new Date();
         const params = new URLSearchParams(location.search);
-        const isDev = params.get('dev') === 'true';
-        const isReset = params.get('reset') === 'true';
+        const isBypass = params.get('bypass') === 'true' || params.get('dev') === 'true';
 
-        if (isReset) {
-            localStorage.removeItem('has_seen_suman_surprise_mobile');
-        }
-
-        const hasSeen = localStorage.getItem('has_seen_suman_surprise_mobile');
-
-        if (isMobileScreen && hasSeen && !isDev) {
+        if (now > deadline && !isBypass) {
             navigate('/', { replace: true });
         }
-        // Note: flag is now set only when message phase starts below
 
-        // Anti-Screenshot & Anti-Copy
-        const preventCopy = (e) => e.preventDefault();
-        document.addEventListener('contextmenu', preventCopy);
-        document.addEventListener('copy', preventCopy);
+        // --- ENHANCED SECURITY (Anti-Screenshot/Recording) ---
+        const preventOps = (e) => {
+            e.preventDefault();
+            return false;
+        };
+
+        const handleKeys = (e) => {
+            // PrintScreen, Cmd+Shift+3/4/5 (Mac), Win+Shift+S (Windows)
+            if (
+                e.key === 'PrintScreen' || 
+                (e.metaKey && e.shiftKey) || 
+                (e.ctrlKey && e.key === 'p') ||
+                (e.metaKey && e.key === 'p')
+            ) {
+                setPageBlur(true);
+                // Also prevent the default browser behavior
+                if (e.key === 'p') e.preventDefault();
+            }
+        };
+
+        document.addEventListener('contextmenu', preventOps);
+        document.addEventListener('copy', preventOps);
+        document.addEventListener('keydown', handleKeys);
+        
+        // Mobile-first protection: Blur on any multi-touch (screenshot gestures)
+        const handleTouchStart = (e) => {
+            if (e.touches.length > 1) setPageBlur(true);
+        };
+        const handleTouchEnd = () => {
+            // Optional: reset after clear touch, but better to stay safe
+        };
+
+        window.addEventListener('touchstart', handleTouchStart);
+        window.addEventListener('touchend', handleTouchEnd);
+        window.addEventListener('blur', () => setPageBlur(true));
+        window.addEventListener('focus', () => setPageBlur(false));
 
         return () => {
             window.removeEventListener('resize', handleResize);
-            document.removeEventListener('contextmenu', preventCopy);
-            document.removeEventListener('copy', preventCopy);
+            document.removeEventListener('contextmenu', preventOps);
+            document.removeEventListener('copy', preventOps);
+            document.removeEventListener('keydown', handleKeys);
+            window.removeEventListener('touchstart', handleTouchStart);
+            window.removeEventListener('touchend', handleTouchEnd);
+            window.removeEventListener('blur', () => setPageBlur(true));
+            window.removeEventListener('focus', () => setPageBlur(false));
         };
     }, [navigate, location, isMobileScreen]);
-
-    // Focus Lock for Screenshot Prevention
-    const [pageBlur, setPageBlur] = useState(false);
-    useEffect(() => {
-        const hBlur = () => setPageBlur(true);
-        const hFocus = () => setPageBlur(false);
-        window.addEventListener('blur', hBlur);
-        window.addEventListener('focus', hFocus);
-        return () => {
-            window.removeEventListener('blur', hBlur);
-            window.removeEventListener('focus', hFocus);
-        };
-    }, []);
 
     // Floating hearts canvas
     useEffect(() => {
@@ -116,16 +137,13 @@ const ForSuman = () => {
         return () => { cancelAnimationFrame(frame); window.removeEventListener('resize', onResize); };
     }, []);
 
-    // Auto-advance to full message & set seen flag if on mobile
+    // Auto-advance to full message
     useEffect(() => {
         const t = setTimeout(() => {
             setPhase(1);
-            if (isMobileScreen) {
-                localStorage.setItem('has_seen_suman_surprise_mobile', 'true');
-            }
-        }, 3500); // 3.5s delay before message reveal & lock
+        }, 3500); // 3.5s delay before message reveal
         return () => clearTimeout(t);
-    }, [isMobileScreen]);
+    }, []);
 
     return (
         <div style={{
@@ -141,9 +159,22 @@ const ForSuman = () => {
             padding: '40px 20px',
             userSelect: 'none',
             WebkitUserSelect: 'none',
-            filter: pageBlur ? 'blur(40px) contrast(0.5)' : 'none',
-            transition: 'filter 0.3s'
+            filter: pageBlur ? 'blur(100px) brightness(0.1)' : 'none',
+            transition: 'filter 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+            pointerEvents: pageBlur ? 'none' : 'auto'
         }}>
+            {/* Kill-switch overlay for screen recording/multitasking */}
+            {pageBlur && (
+                <div style={{
+                    position: 'fixed', inset: 0, zIndex: 99999, background: '#000',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                    color: 'rgba(255,255,255,0.4)', textAlign: 'center', padding: '20px'
+                }}>
+                    <div style={{ fontSize: '3rem', marginBottom: '20px' }}>🔒</div>
+                    <div style={{ fontSize: '0.9rem', letterSpacing: '4px', fontWeight: 900 }}>CONTENT_PROTECTED</div>
+                    <div style={{ fontSize: '0.7rem', marginTop: '10px', color: 'rgba(255,100,200,0.5)' }}>Recording or Multitasking Detected</div>
+                </div>
+            )}
             {/* Print protection */}
             <style>{`
                 @media print { body { display: none !important; } }
