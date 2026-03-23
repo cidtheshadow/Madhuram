@@ -53,7 +53,8 @@ function AnimatedRoutes() {
 
 function AppContent() {
   const [showLoader, setShowLoader] = useState(() => {
-    return !sessionStorage.getItem('madhuram_loader_seen');
+    const isBot = /bot|googlebot|crawler|spider|robot|crawling|lighthouse|speed|PTST/i.test(navigator.userAgent || '');
+    return !sessionStorage.getItem('madhuram_loader_seen') && !isBot;
   });
   const [isMuted, setIsMuted] = useState(true);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);

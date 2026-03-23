@@ -363,24 +363,24 @@ const Home = () => {
 
                 <div style={{ position: 'relative', zIndex: 2, textAlign: isMobile ? 'center' : 'left' }}>
                     <motion.h2
-                        initial={{ opacity: 0, y: 30 }}
+                        initial={{ opacity: 0.01, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 1, delay: 0.2 }}
+                        transition={{ duration: isMobile ? 0.6 : 1, delay: isMobile ? 0 : 0.2 }}
                         style={{ color: '#ebff00', fontSize: isMobile ? '1.1rem' : 'clamp(1.2rem, 3vw, 2.5rem)', margin: 0, fontFamily: 'Montserrat, sans-serif', fontWeight: 800, textTransform: 'uppercase', letterSpacing: isMobile ? '1px' : 'normal' }}
                     >
                         THE ANNUAL CULTURAL<br />FEST OF SLIET
                     </motion.h2>
 
                     <motion.h1
-                        initial={{ opacity: 0, y: 30 }}
+                        initial={{ opacity: 0.01, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 1.2, delay: 0.4 }}
+                        transition={{ duration: isMobile ? 0.8 : 1.2, delay: isMobile ? 0.1 : 0.4 }}
                         style={{ color: '#ebff00', fontSize: isMobile ? '3.2rem' : 'clamp(4rem, 12vw, 9rem)', margin: '15px 0 35px 0', fontFamily: '"Mystery Quest", system-ui', fontWeight: 'normal', textShadow: '4px 4px 0 rgba(0,0,0,0.5)', wordBreak: 'break-word', lineHeight: 1 }}
                     >
                         mADHURAM'26
                     </motion.h1>
 
-                    <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.6 }}>
+                    <motion.div initial={{ opacity: 0.01, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: isMobile ? 0.6 : 0.8, delay: isMobile ? 0.2 : 0.6 }}>
                         <button
                             onClick={(e) => { e.stopPropagation(); navigate('/register'); }}
                             className="register-glimmer-btn"
