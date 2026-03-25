@@ -6,12 +6,12 @@ import { lazy, Suspense, useState, useEffect, useRef } from 'react';
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { Analytics } from "@vercel/analytics/react";
 
-const Home = lazy(() => import('./pages/Home'));
 const About = lazy(() => import('./pages/About'));
 const Events = lazy(() => import('./pages/Events'));
 const Sponsors = lazy(() => import('./pages/Sponsors'));
 const Team = lazy(() => import('./pages/Team'));
 const Register = lazy(() => import('./pages/Register'));
+import Home from './pages/Home';
 const ForSuman = lazy(() => import('./pages/ForSuman'));
 const ForKalpana = lazy(() => import('./pages/ForKalpana'));
 import { motion } from 'framer-motion';
@@ -146,23 +146,29 @@ function AppContent() {
               e.target.loadVideoById({ videoId: TRACKS[5].id, startSeconds: TRACKS[5].start || 0 });
             }
 
-            // Attempt play — browsers may block autoplay without a gesture
-            const p = e.target.playVideo();
-            if (p instanceof Promise) {
-              p.catch(() => {
-                // Blocked: wait for first user interaction
-                const unlock = () => {
-                  tryPlay();
-                  document.removeEventListener('click', unlock);
-                  document.removeEventListener('keydown', unlock);
-                  document.removeEventListener('touchstart', unlock);
-                };
-                document.addEventListener('click', unlock, { once: true });
-                document.addEventListener('keydown', unlock, { once: true });
-                document.addEventListener('touchstart', unlock, { once: true });
-              });
-            }
+            // Fallback for browsers blocking autoplay: Add interaction listeners to force play
+            const unlock = () => {
+              // Only try to play if it isn't playing already
+              if (playerRef.current?.getPlayerState() !== 1) {
+                  playerRef.current?.playVideo();
+              }
+              document.removeEventListener('click', unlock);
+              document.removeEventListener('keydown', unlock);
+              document.removeEventListener('touchstart', unlock);
+            };
+            document.addEventListener('click', unlock, { once: true });
+            document.addEventListener('keydown', unlock, { once: true });
+            document.addEventListener('touchstart', unlock, { once: true });
+            
+            e.target.playVideo();
             setIsMuted(false);
+          },
+          onStateChange: (e) => {
+             // If playing, we assume we are not muted (conceptually, to the user)
+             // or at least audio should be playing.
+             if (e.data === 1) { // 1 = YT.PlayerState.PLAYING
+                 setIsMuted(false);
+             }
           }
         }
       });
@@ -181,8 +187,8 @@ function AppContent() {
       }
     };
 
-    // Delay YouTube loading to prevent main thread blocking during initial render
-    const tm = setTimeout(loadYT, 3000);
+    // Load YouTube API shortly after mount to ensure audio is ready
+    const tm = setTimeout(loadYT, 100);
     return () => clearTimeout(tm);
   }, []);
 
@@ -202,8 +208,11 @@ function AppContent() {
   return (
     <>
       <CustomCursor />
-      {/* Hidden YouTube audio player */}
-      <div id="bg-youtube-audio" style={{ display: 'none' }} />
+      {/* Hidden YouTube audio player (dangerouslySetInnerHTML prevents React from trying to re-render the iframe into a div) */}
+      <div 
+        style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', width: '250px', height: '250px', overflow: 'hidden', top: '-9999px', left: '-9999px' }} 
+        dangerouslySetInnerHTML={{ __html: '<div id="bg-youtube-audio"></div>' }} 
+      />
 
       {/* Auto-play loading animation on first visit */}
       {showLoader && (

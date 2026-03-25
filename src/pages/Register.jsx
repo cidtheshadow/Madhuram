@@ -92,8 +92,8 @@ const RegistrationForm = ({ isSliet, onBack, initialEvent, isMobile }) => {
             style={{ background: 'var(--bg-card)', padding: isMobile ? '30px 20px' : '50px', borderRadius: '30px', border: '1px solid rgba(255,255,255,0.05)', maxWidth: '900px', margin: '0 auto' }}>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
-                <h3 style={{ color: isSliet ? 'var(--pink)' : 'var(--cyan)', margin: 0, fontSize: isMobile ? '1.2rem' : '1.5rem', fontWeight: 900 }}>{isSliet ? 'INTERNAL RELAY' : 'EXTERNAL ACCESS'}</h3>
-                <button onClick={onBack} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem' }}><ArrowLeft size={16} /> CHANGE PATH</button>
+                <h3 style={{ color: isSliet ? 'var(--pink)' : 'var(--cyan)', margin: 0, fontSize: isMobile ? '1.2rem' : '1.5rem', fontWeight: 900 }}>{isSliet ? 'Internal Registration' : 'External Registration'}</h3>
+                <button onClick={onBack} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem' }}><ArrowLeft size={16} /> Go Back</button>
             </div>
 
             {status === 'success' ? (
@@ -142,49 +142,49 @@ const RegistrationForm = ({ isSliet, onBack, initialEvent, isMobile }) => {
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
                     <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: '25px' }}>
                         <div>
-                            <div style={{ fontSize: '0.7rem', fontWeight: 900, color: 'var(--pink)', letterSpacing: '2px', marginBottom: '10px' }}>FULL_NAME</div>
-                            <input required name="name" value={formData.name} onChange={handleChange} style={inputStyle} placeholder="ENTER IDENTIFIER" />
+                            <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--pink)', letterSpacing: '1px', marginBottom: '10px' }}>Full Name</div>
+                            <input required name="name" value={formData.name} onChange={handleChange} style={inputStyle} placeholder="Enter your full name" />
                         </div>
                         {!isSliet ? (
                             <div>
-                                <div style={{ fontSize: '0.7rem', fontWeight: 900, color: 'var(--pink)', letterSpacing: '2px', marginBottom: '10px' }}>COLLEGE_NODE</div>
-                                <input required name="college_name" value={formData.college_name} onChange={handleChange} style={inputStyle} placeholder="UNIVERSITY NAME" />
+                                <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--pink)', letterSpacing: '1px', marginBottom: '10px' }}>College Name</div>
+                                <input required name="college_name" value={formData.college_name} onChange={handleChange} style={inputStyle} placeholder="Enter your college name" />
                             </div>
                         ) : (
                             <div>
-                                <div style={{ fontSize: '0.7rem', fontWeight: 900, color: 'var(--pink)', letterSpacing: '2px', marginBottom: '10px' }}>TRADE / BRANCH</div>
-                                <input required name="trade" value={formData.trade} onChange={handleChange} style={inputStyle} placeholder="COURSE & BRANCH" />
+                                <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--pink)', letterSpacing: '1px', marginBottom: '10px' }}>Trade / Branch</div>
+                                <input required name="trade" value={formData.trade} onChange={handleChange} style={inputStyle} placeholder="Course & Branch" />
                             </div>
                         )}
                         <div>
-                            <div style={{ fontSize: '0.7rem', fontWeight: 900, color: 'var(--pink)', letterSpacing: '2px', marginBottom: '10px' }}>PHONE_NUMBER</div>
-                            <input required type="tel" pattern="[0-9]{10}" name="whatsapp_no" value={formData.whatsapp_no} onChange={handleChange} style={inputStyle} placeholder="10-DIGIT MOBILE NUMBER" />
+                            <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--pink)', letterSpacing: '1px', marginBottom: '10px' }}>WhatsApp Number</div>
+                            <input required type="tel" pattern="[0-9]{10}" name="whatsapp_no" value={formData.whatsapp_no} onChange={handleChange} style={inputStyle} placeholder="10-digit mobile number" />
                         </div>
                         <div>
-                            <div style={{ fontSize: '0.7rem', fontWeight: 900, color: 'var(--pink)', letterSpacing: '2px', marginBottom: '10px' }}>ROLL_SEQUENCE</div>
-                            <input required name="reg_no" value={formData.reg_no} onChange={handleChange} style={inputStyle} placeholder="SERIAL_NUMBER" />
+                            <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--pink)', letterSpacing: '1px', marginBottom: '10px' }}>Registration Number</div>
+                            <input required name="reg_no" value={formData.reg_no} onChange={handleChange} style={inputStyle} placeholder="Enter registration number" />
                         </div>
                         <div>
-                            <div style={{ fontSize: '0.7rem', fontWeight: 900, color: 'var(--pink)', letterSpacing: '2px', marginBottom: '10px' }}>EVENT_TAG</div>
-                            <select required name="event_name" value={formData.event_name} onChange={handleChange} style={inputStyle}>
-                                <option value="" disabled>SELECT TARGET</option>
-                                {eventsList.map(ev => <option key={ev} value={ev}>{ev}</option>)}
+                            <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--pink)', letterSpacing: '1px', marginBottom: '10px' }}>Event Name</div>
+                            <select required name="event_name" value={formData.event_name} onChange={handleChange} style={{ ...inputStyle, appearance: 'none', backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'white\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 15px center', backgroundSize: '16px', cursor: 'pointer' }}>
+                                <option value="" disabled style={{ background: '#111', color: '#fff' }}>Select an Event</option>
+                                {eventsList.map(ev => <option key={ev} value={ev} style={{ background: '#111', color: '#fff' }}>{ev}</option>)}
                             </select>
                         </div>
                         <div>
-                            <div style={{ fontSize: '0.7rem', fontWeight: 900, color: 'var(--pink)', letterSpacing: '2px', marginBottom: '10px' }}>UNIT_LOGIC</div>
-                            <select required name="performance_type" value={formData.performance_type} onChange={handleChange} style={inputStyle}>
-                                <option value="" disabled>SELECT TYPE</option>
-                                <option value="Solo">SOLO</option>
-                                <option value="Duo">DUO</option>
-                                <option value="Group">GROUP</option>
+                            <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--pink)', letterSpacing: '1px', marginBottom: '10px' }}>Performance Type</div>
+                            <select required name="performance_type" value={formData.performance_type} onChange={handleChange} style={{ ...inputStyle, appearance: 'none', backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'white\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 15px center', backgroundSize: '16px', cursor: 'pointer' }}>
+                                <option value="" disabled style={{ background: '#111', color: '#fff' }}>Select Type</option>
+                                <option value="Solo" style={{ background: '#111', color: '#fff' }}>Solo</option>
+                                <option value="Duo" style={{ background: '#111', color: '#fff' }}>Duo</option>
+                                <option value="Group" style={{ background: '#111', color: '#fff' }}>Group</option>
                             </select>
                         </div>
                     </div>
 
                     <div>
-                        <div style={{ fontSize: '0.7rem', fontWeight: 900, color: 'var(--pink)', letterSpacing: '2px', marginBottom: '10px' }}>PERFORMANCE_LOAD</div>
-                        <textarea required name="performance_details" value={formData.performance_details} onChange={handleChange} rows="3" style={inputStyle} placeholder="DESCRIBE SEQUENCE..." />
+                        <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--pink)', letterSpacing: '1px', marginBottom: '10px' }}>Performance Details</div>
+                        <textarea required name="performance_details" value={formData.performance_details} onChange={handleChange} rows="3" style={inputStyle} placeholder="Briefly describe your performance details..." />
                     </div>
 
                     {!isSliet && (
@@ -193,11 +193,11 @@ const RegistrationForm = ({ isSliet, onBack, initialEvent, isMobile }) => {
                                 <div style={{ flex: 1 }}>
                                     <label style={{ display: 'flex', alignItems: 'center', gap: '15px', color: '#fff', cursor: 'pointer', marginBottom: '20px' }}>
                                         <input type="checkbox" name="accommodation" checked={formData.accommodation} onChange={handleChange} style={{ width: '22px', height: '22px', accentColor: 'var(--cyan)' }} />
-                                        REQUEST_HOSTEL_HOSTING
+                                        Request Hostel Accommodation
                                     </label>
                                     <label style={{ display: 'flex', alignItems: 'start', gap: '15px', color: '#fff', cursor: 'pointer' }}>
                                         <input type="checkbox" required name="payment_paid" checked={formData.payment_paid} onChange={handleChange} style={{ width: '22px', height: '22px', accentColor: 'var(--pink)', marginTop: '5px' }} />
-                                        <div>SYNC_PAYMENT_COMPLETE <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', marginTop: '5px' }}>Fee verified via scan below.</div></div>
+                                        <div>Payment Completed <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', marginTop: '5px' }}>Fee verified via scan below.</div></div>
                                     </label>
                                 </div>
                                 <div style={{ background: '#fff', padding: '15px', borderRadius: '15px' }}>
@@ -209,8 +209,8 @@ const RegistrationForm = ({ isSliet, onBack, initialEvent, isMobile }) => {
 
                     {errorMessage && <div style={{ color: 'var(--pink)', padding: '15px', background: 'rgba(247,0,255,0.1)', border: '1px solid var(--pink)', borderRadius: '12px', fontSize: '0.9rem' }}>{errorMessage}</div>}
 
-                    <button type="submit" disabled={status === 'submitting'} className="btn-primary" style={{ padding: '20px', fontSize: '1.2rem', opacity: status === 'submitting' ? 0.6 : 1 }}>
-                        {status === 'submitting' ? 'SYNCHRONIZING...' : 'EXECUTE REGISTRATION'}
+                    <button type="submit" disabled={status === 'submitting'} className="btn-primary" style={{ padding: '20px', fontSize: '1.2rem', opacity: status === 'submitting' ? 0.6 : 1, cursor: 'pointer' }}>
+                        {status === 'submitting' ? 'Submitting...' : 'Submit Registration'}
                     </button>
                 </form>
             )}
@@ -236,22 +236,22 @@ const Register = () => {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ padding: isMobile ? '40px 20px 100px' : '80px 10vw 120px', minHeight: '90vh' }}>
 
             <div style={{ textAlign: 'center', marginBottom: isMobile ? '40px' : '60px' }}>
-                <h1 style={{ fontSize: isMobile ? '3rem' : '5rem', fontWeight: 900, color: '#fff', margin: 0, fontFamily: 'var(--font-logo)' }}>SYNC_PORTAL</h1>
-                {eventParam && <p style={{ color: 'var(--yellow)', fontSize: '1.2rem', marginTop: '15px', fontWeight: 900 }}>RESERVED FOR: {initialEvent}</p>}
+                <h1 style={{ fontSize: isMobile ? '3rem' : '5rem', fontWeight: 900, color: '#fff', margin: 0, fontFamily: 'var(--font-logo)' }}>Registration</h1>
+                {eventParam && <p style={{ color: 'var(--yellow)', fontSize: '1.2rem', marginTop: '15px', fontWeight: 900 }}>Registering for: {initialEvent}</p>}
             </div>
 
             <AnimatePresence mode="wait">
                 {registrationState === 'none' && (
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
                         style={{ background: 'rgba(255,255,255,0.02)', padding: isMobile ? '60px 20px' : '100px', borderRadius: '40px', border: '1px solid rgba(255,255,255,0.05)', textAlign: 'center' }}>
-                        <h2 style={{ fontSize: isMobile ? '2.5rem' : '4rem', fontWeight: 900, marginBottom: '20px' }}>SELECT PATH</h2>
-                        <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem', marginBottom: '60px' }}>Choose your origin to begin registration.</p>
+                        <h2 style={{ fontSize: isMobile ? '2.5rem' : '3.5rem', fontWeight: 800, marginBottom: '20px' }}>Select Registration Type</h2>
+                        <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem', marginBottom: '60px' }}>Choose your category to begin registration.</p>
 
                         <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '30px', justifyContent: 'center' }}>
                             <button onClick={() => setRegistrationState('sliet')} className="btn-primary"
-                                style={{ background: 'var(--pink)', padding: '25px 60px', borderRadius: '20px', fontSize: '1.4rem', boxShadow: '0 20px 40px rgba(247,0,255,0.2)' }}>INTERNAL_SLIET</button>
+                                style={{ background: 'var(--pink)', padding: '25px 60px', borderRadius: '20px', fontSize: '1.2rem', fontWeight: 700, boxShadow: '0 20px 40px rgba(247,0,255,0.2)', cursor: 'pointer' }}>SLIET Student</button>
                             <button onClick={() => window.location.href = 'https://unstop.com/college-fests/madhuram26-sant-longowal-institute-of-engineering-and-technology-longowal-punjab-450932'} className="btn-primary"
-                                style={{ background: 'var(--cyan)', color: '#000', padding: '25px 60px', borderRadius: '20px', fontSize: '1.4rem', boxShadow: '0 20px 40px rgba(0,240,255,0.2)' }}>EXTERNAL_GUEST</button>
+                                style={{ background: 'var(--cyan)', color: '#000', padding: '25px 60px', borderRadius: '20px', fontSize: '1.2rem', fontWeight: 700, boxShadow: '0 20px 40px rgba(0,240,255,0.2)', cursor: 'pointer' }}>External Participant</button>
                         </div>
                     </motion.div>
                 )}

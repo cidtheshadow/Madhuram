@@ -55,7 +55,7 @@ const Home = () => {
     ];
 
     const faqs = [
-        { q: "What is Madhuram?", a: "Madhuram is the Annual Cultural Fest of SLIET, an expression of euphoria with over 1.5M+ students from 7000+ colleges." },
+        { q: "What is Madhuram?", a: "Madhuram is the Annual Cultural Fest of SLIET, an expression of euphoria with over 5000+ students and 10000+ footfall across India." },
         { q: "When was Madhuram established?", a: "Madhuram was established in 1989 with a vision to revolutionize technical education in the region." },
         { q: "What is the mission of Madhuram?", a: "To serve as a dynamic catalyst for cultural integration, bridging the gap between technical innovation and human expression through inclusive excellence." },
         { q: "Where is SLIET located?", a: "SLIET is located in Longowal, Sangrur, Punjab, India on a 451-Acre Eco scale." },
@@ -352,13 +352,15 @@ const Home = () => {
                     display: 'flex', flexDirection: 'column', justifyContent: 'center',
                     padding: isMobile ? '0 5vw' : '0 10vw',
                     paddingTop: isMobile ? '60px' : '68px',
-                    backgroundImage: `linear-gradient(rgba(42, 12, 36, 0.4), rgba(42, 12, 36, 0.7)), url("${heroBg}")`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
                     overflow: 'hidden',
                     cursor: 'crosshair',
                 }}
             >
+                {/* Immediate IMG tag ensures browser preloader picks this up instantly for LCP */}
+                <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+                    <img src={heroBg} alt="" fetchpriority="high" decoding="sync" style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', top: 0, left: 0 }} />
+                    <div style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, background: 'linear-gradient(rgba(42, 12, 36, 0.4), rgba(42, 12, 36, 0.7))' }} />
+                </div>
                 <canvas ref={canvasRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 1 }} />
 
                 <div style={{ position: 'relative', zIndex: 2, textAlign: isMobile ? 'center' : 'left' }}>
