@@ -223,6 +223,9 @@ const Register = () => {
     const eventParam = searchParams.get('event');
     const [registrationState, setRegistrationState] = useState('none');
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+    const canvasRef = useRef(null);
+    const containerRef = useRef(null);
+    const mouseRef = useRef({ x: -1000, y: -1000, active: false });
 
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth < 1024);
@@ -230,37 +233,192 @@ const Register = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+
+        const colors = ['#D1FF00', '#f700ff', '#00f0ff', '#FF0055'];
+        let particles = [];
+        
+        const initializeParticles = () => {
+            const count = isMobile ? 6 : 18;
+            particles = [];
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 0.4,
+                    vy: (Math.random() - 0.5) * 0.4,
+                    radius: Math.random() * 15 + 5,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    type: Math.floor(Math.random() * 3)
+                });
+            }
+        };
+
+        const drawStarburst = (x, y, r, c, alpha) => {
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.strokeStyle = c;
+            ctx.lineWidth = 0.4;
+            ctx.shadowBlur = 6;
+            ctx.shadowColor = c;
+            ctx.beginPath();
+            const rays = 12;
+            for (let i = 0; i < rays; i++) {
+                const a = (Math.PI * 2 / rays) * i;
+                const len = i % 2 === 0 ? r : r * 0.5;
+                ctx.moveTo(x, y);
+                ctx.lineTo(x + Math.cos(a) * len, y + Math.sin(a) * len);
+            }
+            ctx.stroke();
+            ctx.restore();
+        };
+
+        const drawGeometric = (x, y, r, c, alpha) => {
+            ctx.save();
+            ctx.globalAlpha = alpha * 0.8;
+            ctx.strokeStyle = c;
+            ctx.lineWidth = 0.5;
+            ctx.shadowBlur = 4;
+            ctx.shadowColor = c;
+            ctx.translate(x, y);
+            ctx.rotate(performance.now() * 0.0005);
+            ctx.beginPath();
+            for (let i = 0; i < 3; i++) {
+                const a = (Math.PI * 2 / 3) * i;
+                ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+            }
+            ctx.closePath();
+            ctx.stroke();
+            ctx.rotate(Math.PI);
+            ctx.beginPath();
+            for (let i = 0; i < 3; i++) {
+                const a = (Math.PI * 2 / 3) * i;
+                ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+            }
+            ctx.closePath();
+            ctx.stroke();
+            ctx.restore();
+        };
+
+        const drawFineCircle = (x, y, r, c, alpha) => {
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.strokeStyle = c;
+            ctx.lineWidth = 0.5;
+            ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.stroke();
+            ctx.beginPath(); ctx.arc(x, y, r * 0.7, 0, Math.PI * 2); ctx.stroke();
+            ctx.restore();
+        };
+
+        const onMouseMove = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouseRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top, active: true };
+        };
+
+        const onMouseLeave = () => { mouseRef.current.active = false; };
+
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseleave', onMouseLeave);
+        initializeParticles();
+
+        let animationId;
+        const render = () => {
+            ctx.clearRect(0, 0, width, height);
+            ctx.globalCompositeOperation = 'lighter';
+            const mouse = mouseRef.current;
+
+            particles.forEach((p, i) => {
+                p.x += p.vx; p.y += p.vy;
+                
+                if (mouse.active) {
+                    const dx = mouse.x - p.x;
+                    const dy = mouse.y - p.y;
+                    const d = Math.sqrt(dx * dx + dy * dy);
+                    if (d < 250) {
+                        p.vx += dx * 0.00005;
+                        p.vy += dy * 0.00005;
+                    }
+                }
+                p.vx *= 0.99; p.vy *= 0.99;
+
+                if (p.x < -20) p.x = width + 20; if (p.x > width + 20) p.x = -20;
+                if (p.y < -20) p.y = height + 20; if (p.y > height + 20) p.y = -20;
+
+                const alpha = 0.15;
+                if (p.type === 0) drawStarburst(p.x, p.y, p.radius, p.color, alpha);
+                else if (p.type === 1) drawGeometric(p.x, p.y, p.radius, p.color, alpha);
+                else drawFineCircle(p.x, p.y, p.radius, p.color, alpha);
+
+                for (let j = i + 1; j < particles.length; j++) {
+                    const p2 = particles[j];
+                    const dx = p.x - p2.x; const dy = p.y - p2.y;
+                    const d = Math.sqrt(dx * dx + dy * dy);
+                    if (d < 200) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = p.color;
+                        ctx.globalAlpha = (1 - d / 200) * 0.1;
+                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(p.x, p.y);
+                        // Elegant curve matching Home.jsx
+                        ctx.quadraticCurveTo((p.x + p2.x) / 2 + 5, (p.y + p2.y) / 2 - 5, p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                }
+            });
+
+            animationId = requestAnimationFrame(render);
+        };
+        render();
+
+        return () => {
+            window.removeEventListener('mousemove', onMouseMove);
+            window.removeEventListener('mouseleave', onMouseLeave);
+            cancelAnimationFrame(animationId);
+        };
+    }, [isMobile]);
+
     const initialEvent = eventParam ? eventParam.toLowerCase().replace(/(^\w|\s\w)/g, m => m.toUpperCase()) : '';
 
     return (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ padding: isMobile ? '40px 20px 100px' : '80px 10vw 120px', minHeight: '90vh' }}>
+        <div ref={containerRef} style={{ position: 'relative', width: '100%', minHeight: '100vh', backgroundColor: '#2a0c24', overflow: 'hidden' }}>
+            <canvas ref={canvasRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0 }} />
+            
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ position: 'relative', zIndex: 1, padding: isMobile ? '40px 20px 100px' : '80px 10vw 120px' }}>
 
-            <div style={{ textAlign: 'center', marginBottom: isMobile ? '40px' : '60px' }}>
-                <h1 style={{ fontSize: isMobile ? '3rem' : '5rem', fontWeight: 900, color: '#fff', margin: 0, fontFamily: 'var(--font-logo)' }}>Registration</h1>
-                {eventParam && <p style={{ color: 'var(--yellow)', fontSize: '1.2rem', marginTop: '15px', fontWeight: 900 }}>Registering for: {initialEvent}</p>}
-            </div>
+                <div style={{ textAlign: 'center', marginBottom: isMobile ? '40px' : '60px' }}>
+                    <h1 style={{ fontSize: isMobile ? '3rem' : '5rem', fontWeight: 900, color: '#fff', margin: 0, fontFamily: 'var(--font-logo)' }}>Registration</h1>
+                    {eventParam && <p style={{ color: 'var(--yellow)', fontSize: '1.2rem', marginTop: '15px', fontWeight: 900 }}>Registering for: {initialEvent}</p>}
+                </div>
 
-            <AnimatePresence mode="wait">
-                {registrationState === 'none' && (
-                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
-                        style={{ background: 'rgba(255,255,255,0.02)', padding: isMobile ? '60px 20px' : '100px', borderRadius: '40px', border: '1px solid rgba(255,255,255,0.05)', textAlign: 'center' }}>
-                        <h2 style={{ fontSize: isMobile ? '2.5rem' : '3.5rem', fontWeight: 800, marginBottom: '20px' }}>Select Registration Type</h2>
-                        <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem', marginBottom: '60px' }}>Choose your category to begin registration.</p>
+                <AnimatePresence mode="wait">
+                    {registrationState === 'none' && (
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
+                            style={{ background: 'rgba(255,255,255,0.02)', padding: isMobile ? '60px 20px' : '100px', borderRadius: '40px', border: '1px solid rgba(255,255,255,0.05)', textAlign: 'center', backdropFilter: 'blur(10px)' }}>
+                            <h2 style={{ fontSize: isMobile ? '2.5rem' : '3.5rem', fontWeight: 800, marginBottom: '20px' }}>Select Registration Type</h2>
+                            <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem', marginBottom: '60px' }}>Choose your category to begin registration.</p>
 
-                        <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '30px', justifyContent: 'center' }}>
-                            <button onClick={() => setRegistrationState('sliet')} className="btn-primary"
-                                style={{ background: 'var(--pink)', padding: '25px 60px', borderRadius: '20px', fontSize: '1.2rem', fontWeight: 700, boxShadow: '0 20px 40px rgba(247,0,255,0.2)', cursor: 'pointer' }}>SLIET Student</button>
-                            <button onClick={() => window.location.href = 'https://unstop.com/college-fests/madhuram26-sant-longowal-institute-of-engineering-and-technology-longowal-punjab-450932'} className="btn-primary"
-                                style={{ background: 'var(--cyan)', color: '#000', padding: '25px 60px', borderRadius: '20px', fontSize: '1.2rem', fontWeight: 700, boxShadow: '0 20px 40px rgba(0,240,255,0.2)', cursor: 'pointer' }}>External Participant</button>
-                        </div>
-                    </motion.div>
-                )}
+                            <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '30px', justifyContent: 'center' }}>
+                                <button onClick={() => setRegistrationState('sliet')} className="btn-primary"
+                                    style={{ background: 'var(--pink)', padding: '25px 60px', borderRadius: '20px', fontSize: '1.2rem', fontWeight: 700, boxShadow: '0 20px 40px rgba(247,0,255,0.2)', cursor: 'pointer' }}>SLIET Student</button>
+                                <button onClick={() => window.location.href = 'https://unstop.com/college-fests/madhuram26-sant-longowal-institute-of-engineering-and-technology-longowal-punjab-450932'} className="btn-primary"
+                                    style={{ background: 'var(--cyan)', color: '#000', padding: '25px 60px', borderRadius: '20px', fontSize: '1.2rem', fontWeight: 700, boxShadow: '0 20px 40px rgba(0,240,255,0.2)', cursor: 'pointer' }}>External Participant</button>
+                            </div>
+                        </motion.div>
+                    )}
 
-                {registrationState === 'sliet' && <RegistrationForm isSliet={true} onBack={() => setRegistrationState('none')} initialEvent={initialEvent} isMobile={isMobile} />}
-                {registrationState === 'external' && <RegistrationForm isSliet={false} onBack={() => setRegistrationState('none')} initialEvent={initialEvent} isMobile={isMobile} />}
-            </AnimatePresence>
+                    {registrationState === 'sliet' && <RegistrationForm isSliet={true} onBack={() => setRegistrationState('none')} initialEvent={initialEvent} isMobile={isMobile} />}
+                    {registrationState === 'external' && <RegistrationForm isSliet={false} onBack={() => setRegistrationState('none')} initialEvent={initialEvent} isMobile={isMobile} />}
+                </AnimatePresence>
 
-        </motion.div>
+            </motion.div>
+        </div>
     );
 };
 

@@ -21,12 +21,12 @@ const CustomCursor = () => {
     const cursorY = useMotionValue(-200);
 
     // Dot — nearly instant
-    const dotX = useSpring(cursorX, { stiffness: 2000, damping: 60 });
-    const dotY = useSpring(cursorY, { stiffness: 2000, damping: 60 });
+    const dotX = useSpring(cursorX, { stiffness: 1000, damping: 50 });
+    const dotY = useSpring(cursorY, { stiffness: 1000, damping: 50 });
 
     // Ring — lags behind nicely
-    const ringX = useSpring(cursorX, { stiffness: 180, damping: 22 });
-    const ringY = useSpring(cursorY, { stiffness: 180, damping: 22 });
+    const ringX = useSpring(cursorX, { stiffness: 120, damping: 20 });
+    const ringY = useSpring(cursorY, { stiffness: 120, damping: 20 });
 
     useEffect(() => {
         if (isMobile) return; // no custom cursor on touch devices

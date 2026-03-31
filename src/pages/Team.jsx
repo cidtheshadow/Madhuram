@@ -89,9 +89,11 @@ const Team = () => {
             </motion.div>
 
             {/* ARTICHTECTS GRID */}
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(400px, 1fr))', gap: '40px', marginBottom: '120px' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '40px', marginBottom: '120px' }}>
                 {architects.map((arc, i) => (
-                    <TeamCard key={i} {...arc} isMobile={isMobile} />
+                    <div key={i} style={{ flex: isMobile ? '1 1 100%' : '1 1 400px', maxWidth: isMobile ? '100%' : '450px' }}>
+                        <TeamCard {...arc} isMobile={isMobile} />
+                    </div>
                 ))}
             </div>
 
@@ -101,9 +103,11 @@ const Team = () => {
                 <p style={{ color: 'var(--cyan)', fontWeight: 900, letterSpacing: '4px', marginTop: '10px' }}>EXECUTING THE CORE SEQUENCE</p>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(280px, 1fr))', gap: '30px', marginBottom: '120px' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '30px', marginBottom: '120px' }}>
                 {coreTeam.map((member, i) => (
-                    <SmallCard key={i} {...member} color={i % 2 === 0 ? "var(--pink)" : "var(--cyan)"} textCol={i % 2 === 0 ? "var(--pink)" : "var(--cyan)"} isMobile={isMobile} />
+                    <div key={i} style={{ flex: isMobile ? '1 1 100%' : '1 1 280px', maxWidth: isMobile ? '100%' : '350px' }}>
+                        <SmallCard {...member} color={i % 2 === 0 ? "var(--pink)" : "var(--cyan)"} textCol={i % 2 === 0 ? "var(--pink)" : "var(--cyan)"} isMobile={isMobile} />
+                    </div>
                 ))}
             </div>
 
@@ -113,9 +117,13 @@ const Team = () => {
                 <p style={{ color: 'var(--yellow)', fontWeight: 900, letterSpacing: '4px', marginTop: '10px' }}>DESIGNING THE IMMERSION</p>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', maxWidth: '800px', margin: '0 auto 150px', gap: '30px' }}>
-                <SmallCard name="Tanush Singla" role="CREATIVE LEAD" color="var(--yellow)" textCol="var(--yellow)" img="/team/Tanush Singla.jpeg" linkedin="https://www.linkedin.com/in/tanush-singla-330a27281/" isMobile={isMobile} />
-                <SmallCard name="Namit Mehta" role="DESIGN HEAD" color="var(--pink)" textCol="var(--pink)" img="/team/Namit Mehta.jpeg" linkedin="https://www.linkedin.com/in/namit-mehta-374244287/" isMobile={isMobile} />
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', maxWidth: '800px', margin: '0 auto 150px', gap: '30px' }}>
+                <div style={{ flex: isMobile ? '1 1 100%' : '1 1 250px', maxWidth: isMobile ? '100%' : '400px' }}>
+                    <SmallCard name="Tanush Singla" role="CREATIVE LEAD" color="var(--yellow)" textCol="var(--yellow)" img="/team/Tanush Singla.jpeg" linkedin="https://www.linkedin.com/in/tanush-singla-330a27281/" isMobile={isMobile} />
+                </div>
+                <div style={{ flex: isMobile ? '1 1 100%' : '1 1 250px', maxWidth: isMobile ? '100%' : '400px' }}>
+                    <SmallCard name="Namit Mehta" role="DESIGN HEAD" color="var(--pink)" textCol="var(--pink)" img="/team/Namit Mehta.jpeg" linkedin="https://www.linkedin.com/in/namit-mehta-374244287/" isMobile={isMobile} />
+                </div>
             </div>
 
             {/* CONTACT SECTION */}

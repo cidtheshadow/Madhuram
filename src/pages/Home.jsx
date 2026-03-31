@@ -13,6 +13,7 @@ const Home = () => {
     const [openFaq, setOpenFaq] = useState(null);
     const canvasRef = useRef(null);
     const heroRef = useRef(null);
+    const mouseRef = useRef({ x: -1000, y: -1000, active: false });
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
     const [isHeartsMode, setIsHeartsMode] = useState(false);
     const heartsRef = useRef(false);
@@ -48,9 +49,9 @@ const Home = () => {
     };
 
     const gallery = [
-        { title: 'Devine Divas', subtitle: 'Wall of Fame', img: '/wall-of-fame/devine_divas_opt.jpeg', color: '#f700ff' },
+        { title: 'Team Devine Divas', subtitle: 'Wall of Fame', img: '/wall-of-fame/devine_divas_opt.jpeg', color: '#f700ff' },
         { title: 'Khasa Ala Chahar', subtitle: 'Wall of Fame', img: '/wall-of-fame/khasa_ala_opt.jpeg', color: '#ebff00' },
-        { title: 'Modelling', subtitle: 'Wall of Fame', img: '/wall-of-fame/modelling_opt.jpeg', color: '#00f0ff' },
+        { title: 'Team Walk It', subtitle: 'Wall of Fame', img: '/wall-of-fame/modelling_opt.jpeg', color: '#00f0ff' },
         { title: 'Highlights', subtitle: 'Wall of Fame', img: '/wall-of-fame/highlights_opt.jpeg', color: '#f700ff' },
     ];
 
@@ -71,260 +72,293 @@ const Home = () => {
         let height = window.innerHeight;
         canvas.width = width;
         canvas.height = height;
-        const colors = ['#D1FF00', '#f700ff', '#00f0ff', '#FF0055'];
-        let particles = []; // Changed to `let` to allow re-assignment
 
-        const initializeParticles = (currentWidth, currentHeight) => {
-            // Further reduced for performance and aesthetic
-            const pCount = isMobile ? 5 : 22;
-            const newParticles = [];
-            for (let i = 0; i < pCount; i++) {
-                newParticles.push({
-                    x: Math.random() * currentWidth,
-                    y: Math.random() * currentHeight,
-                    vx: (Math.random() - 0.5) * (isMobile ? 0.4 : 0.8),
-                    vy: (Math.random() - 0.5) * (isMobile ? 0.4 : 0.8),
-                    radius: (isMobile ? 8 : 12) + Math.random() * (isMobile ? 10 : 20),
+        const colors = ['#D1FF00', '#f700ff', '#00f0ff', '#FF0055'];
+        
+        let particles = [];
+        const initializeParticles = () => {
+            const count = isMobile ? 12 : 32;
+            particles = [];
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 0.15,
+                    vy: (Math.random() - 0.5) * 0.15,
+                    radius: Math.random() * (isMobile ? 12 : 20) + 5,
                     color: colors[Math.floor(Math.random() * colors.length)],
-                    type: Math.floor(Math.random() * 4)
+                    type: Math.floor(Math.random() * 3), // 0: Flower, 1: Starburst, 2: Orbit
+                    angle: Math.random() * Math.PI * 2,
+                    spin: (Math.random() - 0.5) * 0.02
                 });
             }
-            return newParticles;
         };
 
-        const resizeCanvas = () => {
-            const currentCanvas = canvasRef.current;
-            if (!currentCanvas) return;
-            currentCanvas.width = window.innerWidth;
-            currentCanvas.height = window.innerHeight;
-            width = window.innerWidth; // Update local width/height
-            height = window.innerHeight;
-            particles = initializeParticles(width, height); // Re-initialize particles on resize
-        };
-        window.addEventListener('resize', resizeCanvas);
-
-        const tapFlowers = []; // interactive spawned flowers
-        particles = initializeParticles(width, height);
-
-        const drawStarburst = (x, y, r, c, alpha = 1) => {
+        const drawPremiumFlower = (x, y, r, c, alpha, angle) => {
             ctx.save();
-            ctx.globalAlpha = alpha;
-            ctx.strokeStyle = c; ctx.lineWidth = 1.5; ctx.beginPath();
-            for (let i = 0; i < 8; i++) {
-                const a = (Math.PI / 4) * i;
-                ctx.moveTo(x, y); ctx.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r);
-            }
-            ctx.stroke();
-            ctx.beginPath(); ctx.arc(x, y, r * 0.3, 0, Math.PI * 2); ctx.stroke();
-            ctx.restore();
-        };
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            // Glow - much faster than RadialGradient
+            ctx.beginPath();
+            ctx.fillStyle = c;
+            ctx.globalAlpha = alpha * 0.2;
+            ctx.arc(0, 0, r * 1.6, 0, Math.PI * 2);
+            ctx.fill();
 
-        const drawFlower = (x, y, r, c, alpha = 1) => {
-            ctx.save();
             ctx.globalAlpha = alpha;
-            ctx.fillStyle = 'transparent'; ctx.strokeStyle = c; ctx.lineWidth = 1.5; ctx.beginPath();
-            for (let i = 0; i < 6; i++) {
-                const a = (Math.PI / 3) * i;
-                ctx.moveTo(x, y);
-                ctx.ellipse(x + Math.cos(a) * r * 0.6, y + Math.sin(a) * r * 0.6, r * 0.6, r * 0.2, a, 0, Math.PI * 2);
-            }
-            ctx.stroke();
-            // glowing dot in center
-            ctx.beginPath(); ctx.arc(x, y, r * 0.18, 0, Math.PI * 2);
-            ctx.fillStyle = c; ctx.fill();
-            ctx.restore();
-        };
-
-        const drawDiamondCircle = (x, y, r, c, alpha = 1) => {
-            ctx.save();
-            ctx.globalAlpha = alpha;
-            ctx.strokeStyle = c; ctx.lineWidth = 1.5;
-            ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.stroke();
-            const d = r * 0.6;
-            ctx.beginPath(); ctx.moveTo(x, y - d); ctx.lineTo(x + d, y); ctx.lineTo(x, y + d); ctx.lineTo(x - d, y); ctx.closePath(); ctx.stroke();
-            ctx.beginPath(); ctx.arc(x, y, r * 0.1, 0, Math.PI * 2); ctx.stroke();
-            ctx.restore();
-        };
-
-        const drawEye = (x, y, r, c, alpha = 1) => {
-            ctx.save();
-            ctx.globalAlpha = alpha;
-            ctx.strokeStyle = c; ctx.lineWidth = 1.5; ctx.beginPath();
-            ctx.moveTo(x - r, y);
-            ctx.quadraticCurveTo(x, y - r * 1.2, x + r, y);
-            ctx.quadraticCurveTo(x, y + r * 1.2, x - r, y);
-            ctx.stroke();
-            ctx.fillStyle = '#D1FF00'; ctx.beginPath(); ctx.arc(x, y, r * 0.2, 0, Math.PI * 2); ctx.fill();
-            ctx.restore();
-        };
-
-        const drawHeart = (x, y, r, c, alpha = 1) => {
-            ctx.save(); ctx.globalAlpha = alpha;
-            ctx.strokeStyle = c; ctx.lineWidth = 2;
-            const drawH = (size) => {
-                const ty = y - size * 0.4;
+            ctx.strokeStyle = c;
+            ctx.lineWidth = 1.2;
+            
+            const petals = 8;
+            for (let i = 0; i < petals; i++) {
                 ctx.beginPath();
-                ctx.moveTo(x, ty + size * 0.3);
-                ctx.bezierCurveTo(x, ty, x - size, ty, x - size, ty + size * 0.6);
-                ctx.bezierCurveTo(x - size, ty + size, x, ty + size * 1.3, x, ty + size * 1.6);
-                ctx.bezierCurveTo(x, ty + size * 1.3, x + size, ty + size, x + size, ty + size * 0.6);
-                ctx.bezierCurveTo(x + size, ty, x, ty, x, ty + size * 0.3);
+                ctx.rotate((Math.PI * 2) / petals);
+                ctx.ellipse(r * 0.45, 0, r * 0.55, r * 0.18, 0, 0, Math.PI * 2);
                 ctx.stroke();
-            };
-            drawH(r); // Outer
-            ctx.globalAlpha = alpha * 0.5;
-            drawH(r * 0.6); // Inner
-            ctx.beginPath(); ctx.arc(x, y + r * 0.2, r * 0.15, 0, Math.PI * 2);
-            ctx.fillStyle = c; ctx.fill(); // Glowing Core
+            }
+            
+            ctx.beginPath();
+            ctx.fillStyle = c;
+            ctx.arc(0, 0, r * 0.15, 0, Math.PI * 2);
+            ctx.fill();
             ctx.restore();
         };
 
-        const DRAWERS = [drawStarburst, drawFlower, drawDiamondCircle, drawEye];
-        const ripples = []; // expanding rings on spawn
+        const drawPremiumStarburst = (x, y, r, c, alpha, angle) => {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            
+            // Star Glow
+            ctx.beginPath();
+            ctx.fillStyle = c;
+            ctx.globalAlpha = alpha * 0.25;
+            ctx.arc(0, 0, r * 2.2, 0, Math.PI * 2);
+            ctx.fill();
 
-        // Spawn a flower + burst ripple at click/touch position
-        const spawnFlower = (x, y) => {
-            const color = colors[Math.floor(Math.random() * colors.length)];
-            tapFlowers.push({
-                x, y,
-                radius: 18 + Math.random() * 14,
-                color,
-                type: Math.floor(Math.random() * 4),
-                born: performance.now(),
-                life: 2800,
-            });
-            // spawn 3 offset ripple rings
-            for (let k = 0; k < 3; k++) {
-                ripples.push({ x, y, color, born: performance.now() + k * 80, life: 700, maxR: 55 + k * 20 });
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = c;
+            
+            for (let j = 0; j < 2; j++) {
+                if (j === 1) ctx.rotate(Math.PI / 4);
+                const stretch = j === 0 ? r : r * 0.45;
+                for (let i = 0; i < 4; i++) {
+                    ctx.rotate(Math.PI / 2);
+                    ctx.beginPath();
+                    ctx.moveTo(0, r * 0.05);
+                    ctx.quadraticCurveTo(r * 0.1, r * 0.1, stretch, 0);
+                    ctx.quadraticCurveTo(r * 0.1, -r * 0.1, 0, -r * 0.05);
+                    ctx.fill();
+                }
             }
+            
+            ctx.beginPath();
+            ctx.arc(0, 0, r * 0.1, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
         };
 
-        const hero = heroRef.current;
-        if (!hero) return;
+        const drawPremiumOrbit = (x, y, r, c, alpha, angle) => {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            ctx.globalAlpha = alpha;
+            ctx.strokeStyle = c;
+            ctx.lineWidth = 1;
+
+            // Orbit Glow
+            ctx.beginPath();
+            ctx.arc(0, 0, r * 0.7, 0, Math.PI * 2);
+            ctx.strokeStyle = c;
+            ctx.globalAlpha = alpha * 0.5;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(0, 0, r * 0.35, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            ctx.fillStyle = c;
+            for(let i=0; i<3; i++) {
+                ctx.rotate((Math.PI * 2) / 3);
+                ctx.beginPath();
+                ctx.arc(r * 0.7, 0, r * 0.08, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            ctx.beginPath();
+            ctx.moveTo(0, -r * 0.15);
+            ctx.lineTo(r * 0.15, 0);
+            ctx.lineTo(0, r * 0.15);
+            ctx.lineTo(-r * 0.15, 0);
+            ctx.closePath();
+            ctx.stroke();
+            
+            ctx.restore();
+        };
+
+        const drawHeart = (x, y, size, c, alpha) => {
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.strokeStyle = c;
+            ctx.lineWidth = 1;
+            const ty = y - size * 0.4;
+            ctx.beginPath();
+            ctx.moveTo(x, ty + size * 0.3);
+            ctx.bezierCurveTo(x, ty, x - size, ty, x - size, ty + size * 0.6);
+            ctx.bezierCurveTo(x - size, ty + size, x, ty + size * 1.3, x, ty + size * 1.6);
+            ctx.bezierCurveTo(x, ty + size * 1.3, x + size, ty + size, x + size, ty + size * 0.6);
+            ctx.bezierCurveTo(x + size, ty, x, ty, x, ty + size * 0.3);
+            ctx.stroke();
+            ctx.restore();
+        };
+
+        const tapParticles = [];
+        const spawnTap = (x, y) => {
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const angle = Math.random() * Math.PI * 2;
+            tapParticles.push({
+                x, y,
+                vx: Math.cos(angle) * 0.2,
+                vy: Math.sin(angle) * 0.2,
+                life: 1,
+                decay: 0.012,
+                color,
+                size: 30 + Math.random() * 20, // Single decently sized flower
+                angle: Math.random() * Math.PI * 2,
+                spin: (Math.random() - 0.5) * 0.05
+            });
+        };
+
+        const onResize = () => {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            initializeParticles();
+        };
+
+        const onMouseMove = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouseRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top, active: true };
+        };
+
+        const onMouseLeave = () => {
+            mouseRef.current.active = false;
+        };
 
         const onPointerDown = (e) => {
             const rect = canvas.getBoundingClientRect();
-            const touches = e.touches || [e];
-            Array.from(touches).forEach(t => {
-                spawnFlower(t.clientX - rect.left, t.clientY - rect.top);
-            });
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+            if (clientX !== undefined) {
+                spawnTap(clientX - rect.left, clientY - rect.top);
+            }
         };
 
-        hero.addEventListener('mousedown', onPointerDown);
-        hero.addEventListener('touchstart', onPointerDown, { passive: true });
+        window.addEventListener('resize', onResize);
+        const hero = heroRef.current;
+        if (hero) {
+            hero.addEventListener('mousemove', onMouseMove);
+            hero.addEventListener('mouseleave', onMouseLeave);
+            hero.addEventListener('mousedown', onPointerDown);
+            hero.addEventListener('touchstart', onPointerDown, { passive: true });
+        }
+
+        initializeParticles();
 
         let animationId;
         const render = () => {
             ctx.clearRect(0, 0, width, height);
-            const now = performance.now();
+            ctx.globalCompositeOperation = 'lighter';
+            
+            const mouse = mouseRef.current;
 
-            // ── ambient particles ──
-            particles.forEach(p => {
-                p.x += p.vx; p.y += p.vy;
-                if (p.x < -p.radius) p.x = width + p.radius;
-                if (p.x > width + p.radius) p.x = -p.radius;
-                if (p.y < -p.radius) p.y = height + p.radius;
-                if (p.y > height + p.radius) p.y = -p.radius;
-                // draw the flower slightly larger
+            // Update & Draw Ambient
+            particles.forEach((p, i) => {
+                // Physics
+                p.x += p.vx;
+                p.y += p.vy;
+                p.angle += p.spin;
+
+                // (Mouse attraction Jazz removed for a calmer floating effect)
+                // We keep mouse.active check but don't apply forces here
+                
+                // Friction
+                p.vx *= 0.995;
+                p.vy *= 0.995;
+
+                // Wrap
+                if (p.x < -100) p.x = width + 100;
+                if (p.x > width + 100) p.x = -100;
+                if (p.y < -100) p.y = height + 100;
+                if (p.y > height + 100) p.y = -100;
+
+                // Draw
+                const alpha = isMobile ? 0.35 : 0.25;
                 if (heartsRef.current) {
-                    drawHeart(p.x, p.y, p.radius, p.color, 0.4);
+                    drawHeart(p.x, p.y, p.radius, p.color, alpha);
                 } else {
-                    DRAWERS[p.type](p.x, p.y, p.radius, p.color, 0.3);
+                    if (p.type === 0) drawPremiumFlower(p.x, p.y, p.radius, p.color, alpha, p.angle);
+                    else if (p.type === 1) drawPremiumStarburst(p.x, p.y, p.radius, p.color, alpha, p.angle);
+                    else drawPremiumOrbit(p.x, p.y, p.radius, p.color, alpha, p.angle);
+                }
+
+                // Connections (DISABLED ON MOBILE FOR BUTTERY SMOOTH PERFORMANCE)
+                if (!isMobile) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const p2 = particles[j];
+                        const dx = p.x - p2.x;
+                        const dy = p.y - p2.y;
+                        
+                        // Fast distance check
+                        const distSq = dx * dx + dy * dy;
+                        if (distSq < 48400) { // 220^2
+                            const d = Math.sqrt(distSq);
+                            ctx.beginPath();
+                            ctx.strokeStyle = p.color;
+                            ctx.globalAlpha = (1 - d / 220) * 0.18;
+                            ctx.lineWidth = 0.6;
+                            ctx.moveTo(p.x, p.y);
+                            
+                            // Concentrated curvature
+                            const cpX = (p.x + p2.x) / 2 + (p.y - p2.y) * 0.1;
+                            const cpY = (p.y + p2.y) / 2 + (p2.x - p.x) * 0.1;
+                            ctx.quadraticCurveTo(cpX, cpY, p2.x, p2.y);
+                            ctx.stroke();
+                        }
+                    }
                 }
             });
 
-            // ── ambient connection lines ──
-            ctx.lineWidth = 1;
-            for (let i = 0; i < particles.length; i++) {
-                for (let j = i + 1; j < particles.length; j++) {
-                    const p1 = particles[i], p2 = particles[j];
-                    const dx = p1.x - p2.x, dy = p1.y - p2.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 220) {
-                        ctx.save();
-                        ctx.strokeStyle = p1.color;
-                        ctx.globalAlpha = 1 - dist / 220;
-                        ctx.beginPath();
-                        ctx.moveTo(p1.x, p1.y);
-                        ctx.quadraticCurveTo(p1.x + dx * 0.1, p1.y - dy * 0.1, p2.x, p2.y);
-                        ctx.stroke();
-                        ctx.restore();
-                    }
+            // Tap Particles (Beautiful little flowers blooming)
+            for (let i = tapParticles.length - 1; i >= 0; i--) {
+                const tp = tapParticles[i];
+                tp.life -= tp.decay;
+                if (tp.life <= 0) {
+                    tapParticles.splice(i, 1);
+                    continue;
                 }
-            }
-
-            // ── tap flowers ──
-            for (let i = tapFlowers.length - 1; i >= 0; i--) {
-                const f = tapFlowers[i];
-                const age = now - f.born;
-                if (age > f.life) { tapFlowers.splice(i, 1); continue; }
-
-                // fade: full for first 40%, then fade out
-                const t = age / f.life;
-                const alpha = t < 0.4 ? 1 : 1 - (t - 0.4) / 0.6;
-
-                // draw the flower slightly larger - or heart
-                if (heartsRef.current) {
-                    drawHeart(f.x, f.y, f.radius * (1 + t * 0.4), f.color, alpha);
+                
+                tp.x += tp.vx;
+                tp.y += tp.vy;
+                tp.angle += tp.spin;
+                
+                const progress = 1 - tp.life; // 0 to 1
+                const alpha = Math.min(1, tp.life * 1.5); // Fades out smoothly at the end
+                
+                let currentScale = 1;
+                // Pop in quickly, then shrink slightly
+                if (progress < 0.2) {
+                    currentScale = progress / 0.2; // 0 to 1
                 } else {
-                    DRAWERS[f.type](f.x, f.y, f.radius * (1 + t * 0.4), f.color, alpha);
+                    currentScale = 1 + (progress - 0.2) * 0.5; // slow drift larger
                 }
-
-                // connection lines to nearby ambient particles
-                particles.forEach(p => {
-                    const dx = f.x - p.x, dy = f.y - p.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 320) {
-                        ctx.save();
-                        ctx.strokeStyle = f.color;
-                        ctx.lineWidth = 1.2;
-                        ctx.globalAlpha = alpha * (1 - dist / 320) * 0.9;
-                        ctx.beginPath();
-                        ctx.moveTo(f.x, f.y);
-                        ctx.lineTo(p.x, p.y);
-                        ctx.stroke();
-                        ctx.restore();
-                    }
-                });
-
-                // connection lines to other tap flowers
-                tapFlowers.forEach((f2, j) => {
-                    if (j >= i) return;
-                    const dx = f.x - f2.x, dy = f.y - f2.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 400) {
-                        ctx.save();
-                        ctx.strokeStyle = f.color;
-                        ctx.lineWidth = 1;
-                        ctx.globalAlpha = alpha * (1 - dist / 400) * 0.7;
-                        ctx.setLineDash([4, 4]);
-                        ctx.beginPath();
-                        ctx.moveTo(f.x, f.y); ctx.lineTo(f2.x, f2.y);
-                        ctx.stroke();
-                        ctx.setLineDash([]);
-                        ctx.restore();
-                    }
-                });
-            }
-
-            // ── ripple burst rings ──
-            for (let i = ripples.length - 1; i >= 0; i--) {
-                const rip = ripples[i];
-                const age = now - rip.born;
-                if (age < 0) continue; // staggered start
-                if (age > rip.life) { ripples.splice(i, 1); continue; }
-                const t = age / rip.life;
-                const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
-                const r = eased * rip.maxR;
-                const alpha = (1 - t) * 0.75;
-                ctx.save();
-                ctx.globalAlpha = alpha;
-                ctx.strokeStyle = rip.color;
-                ctx.lineWidth = 1.5;
-                ctx.beginPath();
-                ctx.arc(rip.x, rip.y, r, 0, Math.PI * 2);
-                ctx.stroke();
-                ctx.restore();
+                
+                // Draw little flower
+                drawPremiumFlower(tp.x, tp.y, tp.size * currentScale, tp.color, alpha * 0.8, tp.angle);
+                
+                // Draw a small flare star inside it for extra cuteness
+                drawPremiumStarburst(tp.x, tp.y, (tp.size * currentScale) * 0.5, '#fff', alpha * 0.5, -tp.angle * 2);
             }
 
             animationId = requestAnimationFrame(render);
@@ -332,12 +366,16 @@ const Home = () => {
         render();
 
         return () => {
-            window.removeEventListener('resize', resizeCanvas);
-            hero.removeEventListener('mousedown', onPointerDown);
-            hero.removeEventListener('touchstart', onPointerDown);
+            window.removeEventListener('resize', onResize);
+            if (hero) {
+                hero.removeEventListener('mousemove', onMouseMove);
+                hero.removeEventListener('mouseleave', onMouseLeave);
+                hero.removeEventListener('mousedown', onPointerDown);
+                hero.removeEventListener('touchstart', onPointerDown);
+            }
             cancelAnimationFrame(animationId);
         };
-    }, []);
+    }, [isMobile]);
 
     return (
         <div style={{ backgroundColor: '#2a0c24', minHeight: '100vh', color: '#fff', overflowX: 'hidden', fontFamily: 'Montserrat, sans-serif' }}>
@@ -358,7 +396,7 @@ const Home = () => {
             >
                 {/* Immediate IMG tag ensures browser preloader picks this up instantly for LCP */}
                 <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-                    <img src={heroBg} alt="" fetchpriority="high" decoding="sync" style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', top: 0, left: 0 }} />
+                    <img src={heroBg} alt="" fetchpriority="high" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', top: 0, left: 0 }} />
                     <div style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, background: 'linear-gradient(rgba(42, 12, 36, 0.4), rgba(42, 12, 36, 0.7))' }} />
                 </div>
                 <canvas ref={canvasRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 1 }} />
@@ -387,53 +425,55 @@ const Home = () => {
                             onClick={(e) => { e.stopPropagation(); navigate('/register'); }}
                             className="register-glimmer-btn"
                             style={{
-                                background: '#ebff00',
+                                background: '#bfff00',
                                 color: '#000',
-                                padding: '12px 36px',
-                                fontSize: isMobile ? '1.1rem' : '1.4rem',
+                                padding: '14px 40px',
+                                fontSize: isMobile ? '1.1rem' : '1.35rem',
                                 fontWeight: 900,
                                 borderRadius: '8px',
                                 cursor: 'pointer',
                                 fontFamily: 'Montserrat, sans-serif',
-                                transition: 'all 0.3s ease',
+                                transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
                                 border: 'none',
                                 position: 'relative',
                                 overflow: 'hidden'
                             }}
-                            onMouseOver={(e) => e.target.style.transform = 'scale(1.05)'}
-                            onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
+                            onMouseOver={(e) => {
+                                e.target.style.transform = 'scale(1.03) translateY(-2px)';
+                                e.target.style.boxShadow = '0 12px 30px rgba(191, 255, 0, 0.4)';
+                            }}
+                            onMouseOut={(e) => {
+                                e.target.style.transform = 'scale(1) translateY(0)';
+                                e.target.style.boxShadow = 'none';
+                            }}
                         >
                             REGISTER
                             <style>{`
                                 .register-glimmer-btn::after {
                                     content: '';
                                     position: absolute;
-                                    top: -50%;
-                                    left: -50%;
-                                    width: 200%;
-                                    height: 200%;
+                                    top: 0;
+                                    left: -150%;
+                                    width: 150%;
+                                    height: 100%;
                                     background: linear-gradient(
-                                        to bottom right,
+                                        90deg,
                                         rgba(255, 255, 255, 0) 0%,
-                                        rgba(255, 255, 255, 0) 40%,
-                                        rgba(255, 255, 255, 0.6) 50%,
-                                        rgba(255, 255, 255, 0) 60%,
+                                        rgba(255, 255, 255, 0.5) 50%,
                                         rgba(255, 255, 255, 0) 100%
                                     );
-                                    transform: rotate(45deg);
-                                    animation: glimmer 3s infinite;
+                                    transform: skewX(-20deg);
+                                    animation: elegant-glimmer 7s infinite;
                                 }
-                                @keyframes glimmer {
-                                    0% { transform: translateX(-100%) rotate(45deg); }
-                                    20% { transform: translateX(100%) rotate(45deg); }
-                                    100% { transform: translateX(100%) rotate(45deg); }
+                                @keyframes elegant-glimmer {
+                                    0%, 10% { left: -150%; }
+                                    45%, 100% { left: 150%; }
                                 }
                             `}</style>
                         </button>
                     </motion.div>
                 </div>
 
-                {/* TAP ANYWHERE hint */}
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: [0, 1, 0.5, 1] }}
@@ -445,6 +485,8 @@ const Home = () => {
                         zIndex: 3,
                         textAlign: 'right',
                         pointerEvents: 'none',
+                        backdropFilter: isMobile ? 'blur(8px)' : 'blur(12px)',
+                        WebkitBackdropFilter: isMobile ? 'blur(8px)' : 'blur(12px)',
                     }}
                 >
                     <div style={{
@@ -452,8 +494,8 @@ const Home = () => {
                         fontSize: isMobile ? '1.1rem' : '1.35rem',
                         color: '#f700ff',
                         letterSpacing: '3px',
-                        textShadow: '0 0 12px rgba(247,0,255,0.7)',
-                        lineHeight: 1,
+                        textShadow: '0 0 10px rgba(247,0,255,0.6)',
+                        lineHeight: 1
                     }}>
                         ✦ {isMobile ? 'TOUCH' : 'TAP'} ANYWHERE
                     </div>
@@ -641,10 +683,10 @@ const Home = () => {
                 }}>
                     <iframe
                         style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                        src="https://www.youtube.com/embed/b31xOodlcxg"
+                        src="https://www.youtube.com/embed/AcsTzvBQmqE?si=usN0NXXLHh5v5pzL&mute=1"
                         title="Madhuram 2026 Trailer"
                         frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                         allowFullScreen
                         loading="lazy"
                     ></iframe>
@@ -702,7 +744,8 @@ const Home = () => {
                                     transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
                                     position: 'relative',
                                     overflow: 'hidden',
-                                    backdropFilter: 'blur(10px)',
+                                    backdropFilter: 'blur(12px)',
+                                    WebkitBackdropFilter: 'blur(12px)',
                                     boxShadow: openFaq === index ? '0 10px 30px rgba(235, 255, 0, 0.1)' : 'none'
                                 }}
                             >

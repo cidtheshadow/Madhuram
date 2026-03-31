@@ -19,7 +19,8 @@ import { Volume2, VolumeX, SkipForward, SkipBack, Music } from 'lucide-react';
 import CustomCursor from './components/CustomCursor';
 
 const TRACKS = [
-  { id: 'h7MYJghRWt0', title: 'Die For You', artist: 'VALORANT' },
+  { id: 'x5Oag4hISgU', title: 'Rasputin', artist: 'Boney M.', start: 50 },
+  { id: 'dMM0K6Qa6k0', title: 'Die For You', artist: 'The Weeknd' },
   { id: 'fB8TyLTD7EE', title: 'Legends Never Die', artist: 'Against The Current' },
   { id: 'UoK8DaJR774', title: 'POP/STARS', artist: 'K/DA' },
   { id: 'D9G1VOjua_8', title: 'Enemy', artist: 'Imagine Dragons' },
@@ -111,96 +112,135 @@ function AppContent() {
   // Sync music to secret routes
   useEffect(() => {
     if (location.pathname === '/for-you') {
-      setCurrentTrackIndex(4);
+      setCurrentTrackIndex(5);
       setIsMuted(false);
       setShowSelector(false); // Hide selector on this page
     } else if (location.pathname === '/dairy-milk') {
-      setCurrentTrackIndex(5); // Until I Found You
+      setCurrentTrackIndex(6); // Until I Found You
       setIsMuted(false);
       setShowSelector(false);
     }
   }, [location.pathname]);
 
-  // Load YouTube API and autoplay music with the loading screen
+  const currentTrackIndexRef = useRef(currentTrackIndex);
+  useEffect(() => { currentTrackIndexRef.current = currentTrackIndex; }, [currentTrackIndex]);
+  const isMutedRef = useRef(isMuted);
+  useEffect(() => { isMutedRef.current = isMuted; }, [isMuted]);
+
+  // Load YouTube API and manage PERSISTENT player DOM
   useEffect(() => {
-    const tryPlay = () => {
-      if (playerRef.current?.playVideo) {
+    let container = document.getElementById('madhuram-persistent-audio');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'madhuram-persistent-audio';
+      container.style.cssText = 'position:fixed; top:-9999px; left:-9999px; width:1px; height:1px; opacity:0; pointer-events:none; z-index:-1;';
+      const inner = document.createElement('div');
+      inner.id = 'bg-youtube-audio';
+      container.appendChild(inner);
+      document.body.appendChild(container);
+    }
+
+    const unlock = () => {
+      if (playerRef.current && typeof playerRef.current.playVideo === 'function') {
+        playerRef.current.unMute();
         playerRef.current.setVolume(60);
         playerRef.current.playVideo();
-        setIsMuted(false);
+        if (isMutedRef.current) setIsMuted(false);
       }
+      window.removeEventListener('click', unlock);
+      window.removeEventListener('touchstart', unlock);
+      window.removeEventListener('keydown', unlock);
     };
 
     const initPlayer = () => {
+      // If already initialized, don't do it again
+      if (playerRef.current && typeof playerRef.current.getPlayerState === 'function') return;
+      
       playerRef.current = new window.YT.Player('bg-youtube-audio', {
-        videoId: TRACKS[0].id,
-        playerVars: { autoplay: 1, loop: 1, playlist: TRACKS[0].id, controls: 0, mute: 0 },
+        videoId: TRACKS[currentTrackIndexRef.current].id,
+        playerVars: { 
+          autoplay: 1, 
+          loop: 1, 
+          playlist: TRACKS[currentTrackIndexRef.current].id, 
+          controls: 0, 
+          mute: 1, // Crucial for iOS autoplay
+          enablejsapi: 1,
+          playsinline: 1,
+          origin: window.location.origin,
+          start: TRACKS[currentTrackIndexRef.current].start || 0
+        },
         events: {
           onReady: (e) => {
-            e.target.setVolume(60);
+            e.target.setVolume(isMutedRef.current ? 0 : 60);
             
-            // If on secret pages, load correct track immediately
-            if (location.pathname === '/for-you') {
-              e.target.loadVideoById({ videoId: TRACKS[4].id });
-            } else if (location.pathname === '/dairy-milk') {
-              e.target.loadVideoById({ videoId: TRACKS[5].id, startSeconds: TRACKS[5].start || 0 });
+            // Explicitly load/seek to the start point on first ready
+            if (TRACKS[currentTrackIndexRef.current].start) {
+                e.target.loadVideoById({
+                    videoId: TRACKS[currentTrackIndexRef.current].id,
+                    startSeconds: TRACKS[currentTrackIndexRef.current].start,
+                });
+            } else {
+                e.target.playVideo();
             }
+            window.addEventListener('click', unlock);
+            window.addEventListener('touchstart', unlock);
+            window.addEventListener('keydown', unlock);
 
-            // Fallback for browsers blocking autoplay: Add interaction listeners to force play
-            const unlock = () => {
-              // Only try to play if it isn't playing already
-              if (playerRef.current?.getPlayerState() !== 1) {
-                  playerRef.current?.playVideo();
-              }
-              document.removeEventListener('click', unlock);
-              document.removeEventListener('keydown', unlock);
-              document.removeEventListener('touchstart', unlock);
-            };
-            document.addEventListener('click', unlock, { once: true });
-            document.addEventListener('keydown', unlock, { once: true });
-            document.addEventListener('touchstart', unlock, { once: true });
-            
-            e.target.playVideo();
-            setIsMuted(false);
+            // Nudge mechanism for blocked autoplay
+            const nudge = setInterval(() => {
+                if (playerRef.current && typeof playerRef.current.getPlayerState === 'function') {
+                    const state = playerRef.current.getPlayerState();
+                    if (state === -1 || state === 2) { 
+                        playerRef.current.playVideo();
+                    } else {
+                        clearInterval(nudge);
+                    }
+                }
+            }, 1500);
           },
           onStateChange: (e) => {
-             // If playing, we assume we are not muted (conceptually, to the user)
-             // or at least audio should be playing.
-             if (e.data === 1) { // 1 = YT.PlayerState.PLAYING
-                 setIsMuted(false);
-             }
+             if (e.data === 1) setIsMuted(false); // 1 = PLAYING
+             else if (e.data === -1) e.target.playVideo();
           }
         }
       });
     };
 
-    const loadYT = () => {
-      if (!window.YT) {
-        const tag = document.createElement('script');
-        tag.src = 'https://www.youtube.com/iframe_api';
-        document.head.appendChild(tag);
-        window.onYouTubeIframeAPIReady = initPlayer;
-      } else if (window.YT.Player) {
-        initPlayer();
-      } else {
-        window.onYouTubeIframeAPIReady = initPlayer;
-      }
-    };
+    if (!window.YT) {
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      window.onYouTubeIframeAPIReady = initPlayer;
+    } else {
+      if (window.YT.Player) initPlayer();
+      else window.onYouTubeIframeAPIReady = initPlayer;
+    }
 
-    // Load YouTube API shortly after mount to ensure audio is ready
-    const tm = setTimeout(loadYT, 100);
-    return () => clearTimeout(tm);
+    return () => {
+      window.removeEventListener('click', unlock);
+      window.removeEventListener('touchstart', unlock);
+      window.removeEventListener('keydown', unlock);
+    };
   }, []);
 
   useEffect(() => {
-    if (playerRef.current?.loadVideoById) {
-      playerRef.current.loadVideoById({ videoId: TRACKS[currentTrackIndex].id, startSeconds: TRACKS[currentTrackIndex].start || 0 });
+    if (playerRef.current && typeof playerRef.current.loadVideoById === 'function') {
+      playerRef.current.loadVideoById({ 
+        videoId: TRACKS[currentTrackIndex].id, 
+        startSeconds: TRACKS[currentTrackIndex].start || 0 
+      });
       playerRef.current.setVolume(isMuted ? 0 : 60);
     }
   }, [currentTrackIndex]);
 
   useEffect(() => {
-    if (playerRef.current?.setVolume) playerRef.current.setVolume(isMuted ? 0 : 60);
+    if (playerRef.current && typeof playerRef.current.setVolume === 'function') {
+        playerRef.current.setVolume(isMuted ? 0 : 60);
+        if (!isMuted && playerRef.current.getPlayerState && playerRef.current.getPlayerState() !== 1) {
+            playerRef.current.playVideo();
+        }
+    }
   }, [isMuted]);
 
   const isSecretPage = location.pathname === '/for-you' || location.pathname === '/dairy-milk';
@@ -208,11 +248,6 @@ function AppContent() {
   return (
     <>
       <CustomCursor />
-      {/* Hidden YouTube audio player (dangerouslySetInnerHTML prevents React from trying to re-render the iframe into a div) */}
-      <div 
-        style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', width: '250px', height: '250px', overflow: 'hidden', top: '-9999px', left: '-9999px' }} 
-        dangerouslySetInnerHTML={{ __html: '<div id="bg-youtube-audio"></div>' }} 
-      />
 
       {/* Auto-play loading animation on first visit */}
       {showLoader && (
@@ -221,6 +256,7 @@ function AppContent() {
           sessionStorage.setItem('madhuram_loader_seen', 'true');
         }} />
       )}
+
 
       <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
         <ScrollToTop />

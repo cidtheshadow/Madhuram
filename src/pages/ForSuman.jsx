@@ -80,7 +80,7 @@ const ForSuman = () => {
         };
     }, [navigate, location, isMobileScreen]);
 
-    // Floating hearts canvas
+    // Floating flowers canvas
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -88,10 +88,10 @@ const ForSuman = () => {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        const hearts = Array.from({ length: 40 }, () => ({
+        const flowers = Array.from({ length: 40 }, () => ({
             x: Math.random() * canvas.width,
             y: canvas.height + Math.random() * 200,
-            size: Math.random() * 20 + 8,
+            size: Math.random() * 15 + 10,
             speed: Math.random() * 1.2 + 0.4,
             opacity: Math.random() * 0.6 + 0.2,
             wobble: Math.random() * Math.PI * 2,
@@ -99,33 +99,42 @@ const ForSuman = () => {
             color: ['#f700ff', '#ff69b4', '#ff1493', '#ff6eb4', '#ffa0d0'][Math.floor(Math.random() * 5)],
         }));
 
-        const drawHeart = (cx, cy, size, color, opacity) => {
+        const drawFlower = (cx, cy, size, color, opacity, wobble) => {
             ctx.save();
             ctx.globalAlpha = opacity;
+            ctx.translate(cx, cy);
+            ctx.rotate(wobble); // Rotate slightly based on wobble
+            
+            // Draw petals
             ctx.fillStyle = color;
+            for (let i = 0; i < 5; i++) {
+                ctx.beginPath();
+                ctx.rotate((Math.PI * 2) / 5);
+                ctx.arc(0, -size * 0.6, size * 0.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Draw center
             ctx.beginPath();
-            ctx.moveTo(cx, cy - size * 0.25);
-            ctx.bezierCurveTo(cx, cy - size, cx - size, cy - size, cx - size, cy - size * 0.25);
-            ctx.bezierCurveTo(cx - size, cy + size * 0.1, cx, cy + size * 0.6, cx, cy + size * 0.75);
-            ctx.bezierCurveTo(cx, cy + size * 0.6, cx + size, cy + size * 0.1, cx + size, cy - size * 0.25);
-            ctx.bezierCurveTo(cx + size, cy - size, cx, cy - size, cx, cy - size * 0.25);
-            ctx.closePath();
+            ctx.fillStyle = '#ffeed6'; // soft yellow/white center
+            ctx.arc(0, 0, size * 0.4, 0, Math.PI * 2);
             ctx.fill();
+            
             ctx.restore();
         };
 
         let frame;
         const animate = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            hearts.forEach(h => {
-                h.y -= h.speed;
-                h.wobble += h.wobbleSpeed;
-                h.x += Math.sin(h.wobble) * 0.5;
-                if (h.y < -50) {
-                    h.y = canvas.height + 50;
-                    h.x = Math.random() * canvas.width;
+            flowers.forEach(f => {
+                f.y -= f.speed;
+                f.wobble += f.wobbleSpeed;
+                f.x += Math.sin(f.wobble) * 0.5;
+                if (f.y < -50) {
+                    f.y = canvas.height + 50;
+                    f.x = Math.random() * canvas.width;
                 }
-                drawHeart(h.x, h.y, h.size, h.color, h.opacity);
+                drawFlower(f.x, f.y, f.size, f.color, f.opacity, f.wobble);
             });
             frame = requestAnimationFrame(animate);
         };

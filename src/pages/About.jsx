@@ -86,8 +86,8 @@ const About = () => {
             </div>
 
             {/* GALLERIES */}
-            <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '30px' }}>
-                <div style={{ flex: 2, height: isMobile ? '300px' : '450px', borderRadius: '20px', overflow: 'hidden', position: 'relative' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr', gap: '30px', marginBottom: '30px' }}>
+                <div style={{ height: isMobile ? '300px' : '450px', borderRadius: '20px', overflow: 'hidden', position: 'relative' }}>
                     <div style={{ position: 'absolute', inset: 0, background: 'url(/wall-of-fame/Devine Divas 2.jpeg) center/cover' }} />
                     <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(transparent, rgba(0,0,0,0.8))' }} />
                     <div style={{ position: 'absolute', bottom: '30px', left: '30px' }}>
@@ -95,10 +95,32 @@ const About = () => {
                         <div style={{ color: 'var(--pink)', fontWeight: 800, letterSpacing: '2px' }}>TRADITION MEETS INNOVATION</div>
                     </div>
                 </div>
-                <div style={{ flex: 1, height: isMobile ? '300px' : '450px', borderRadius: '20px', background: 'var(--yellow)', padding: '40px', display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center' }}>
-                    <div style={{ fontSize: '4rem', color: '#000', marginBottom: '20px' }}>⚡</div>
-                    <h3 style={{ color: '#000', fontSize: '2.2rem', fontWeight: 900, lineHeight: 1.1, margin: 0 }}>VIBRANT CULTURE</h3>
-                    <p style={{ color: '#000', fontWeight: 700, marginTop: '20px', opacity: 0.8 }}>An explosion of creativity in every corner.</p>
+                <div style={{ height: isMobile ? '300px' : '450px', borderRadius: '20px', overflow: 'hidden', position: 'relative' }}>
+                    <div style={{ position: 'absolute', inset: 0, background: 'url(https://images.unsplash.com/photo-1540039155732-6808545362ba?w=800&q=80) center/cover' }} />
+                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(transparent, rgba(0,0,0,0.8))' }} />
+                    <div style={{ position: 'absolute', bottom: '30px', left: '30px' }}>
+                        <h3 style={{ color: '#fff', fontSize: '2rem', margin: 0, fontWeight: 900 }}>VIBRANT</h3>
+                        <div style={{ color: 'var(--yellow)', fontWeight: 800, letterSpacing: '2px' }}>CULTURE</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 2fr', gap: '30px' }}>
+                <div style={{ height: isMobile ? '300px' : '400px', borderRadius: '20px', overflow: 'hidden', position: 'relative' }}>
+                    <div style={{ position: 'absolute', inset: 0, background: 'url(https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=800&q=80) center/cover' }} />
+                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(transparent, rgba(0,0,0,0.8))' }} />
+                    <div style={{ position: 'absolute', bottom: '30px', left: '30px' }}>
+                        <h3 style={{ color: '#fff', fontSize: '2rem', margin: 0, fontWeight: 900 }}>NIGHTS</h3>
+                        <div style={{ color: 'var(--cyan)', fontWeight: 800, letterSpacing: '2px' }}>UNFORGETTABLE</div>
+                    </div>
+                </div>
+                <div style={{ height: isMobile ? '300px' : '400px', borderRadius: '20px', overflow: 'hidden', position: 'relative' }}>
+                    <div style={{ position: 'absolute', inset: 0, background: 'url(https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&q=80) center/cover' }} />
+                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(transparent, rgba(0,0,0,0.8))' }} />
+                    <div style={{ position: 'absolute', bottom: '30px', left: '30px', right: '30px' }}>
+                        <h3 style={{ color: '#fff', fontSize: '2.5rem', margin: 0, fontWeight: 900 }}>THE STAGE IS YOURS</h3>
+                        <div style={{ color: 'var(--pink)', fontWeight: 800, letterSpacing: '2px' }}>ARTISTIC EXPRESSION</div>
+                    </div>
                 </div>
             </div>
         </motion.div>
