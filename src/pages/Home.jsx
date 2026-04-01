@@ -57,8 +57,8 @@ const Home = () => {
 
     const faqs = [
         { q: "What is Madhuram?", a: "Madhuram is the Annual Cultural Fest of SLIET, an expression of euphoria with over 5000+ students and 10000+ footfall across India." },
-        { q: "When was Madhuram established?", a: "Madhuram was established in 1989 with a vision to revolutionize technical education in the region." },
-        { q: "What is the mission of Madhuram?", a: "To serve as a dynamic catalyst for cultural integration, bridging the gap between technical innovation and human expression through inclusive excellence." },
+        { q: "When was Madhuram established?", a: "Madhuram was established in 1989 with a vision to revolutionize social education in the region." },
+        { q: "What is the mission of Madhuram?", a: "To serve as a dynamic catalyst for cultural integration, bridging the gap between social innovation and human expression through inclusive excellence." },
         { q: "Where is SLIET located?", a: "SLIET is located in Longowal, Sangrur, Punjab, India on a 451-Acre Eco scale." },
         { q: "What is the SLIET rank and accreditation?", a: "SLIET achieved NIRF Rank 79 and NAAC A-Grade accreditation, recognized among the elite engineering institutions in the nation." },
         { q: "How can I contact the Madhuram team?", a: "You can reach out via email at madhuram@sliet.ac.in or check our Instagram @madhuramsliet." }
@@ -408,7 +408,7 @@ const Home = () => {
                         transition={{ duration: isMobile ? 0.6 : 1, delay: isMobile ? 0 : 0.2 }}
                         style={{ color: '#ebff00', fontSize: isMobile ? '1.1rem' : 'clamp(1.2rem, 3vw, 2.5rem)', margin: 0, fontFamily: 'Montserrat, sans-serif', fontWeight: 800, textTransform: 'uppercase', letterSpacing: isMobile ? '1px' : 'normal' }}
                     >
-                        THE ANNUAL CULTURAL<br />FEST OF SLIET
+                        THE ANNUAL SOCIO-CULTURAL<br />FEST OF SLIET
                     </motion.h2>
 
                     <motion.h1
@@ -561,7 +561,7 @@ const Home = () => {
                     </h2>
                     <div style={{ color: '#e0d6e6', fontSize: '1.05rem', lineHeight: 1.8, fontFamily: 'Montserrat, sans-serif', opacity: 0.95, maxWidth: isMobile ? '100%' : '750px', marginTop: '40px', textAlign: isMobile ? 'left' : 'justify' }}>
                         <p style={{ marginBottom: '16px', fontWeight: 700, color: '#ebff00' }}>EVERY EDITION A NEW LEGEND.</p>
-                        <p style={{ marginBottom: '16px' }}>Madhuram is not just a fest; it's the cultural heartbeat of SLIET Longowal. It's where technical precision meets artistic explosion.</p>
+                        <p style={{ marginBottom: '16px' }}>Madhuram is not just a fest; it's the cultural heartbeat of SLIET Longowal. It's where social precision meets artistic explosion.</p>
                         <p style={{ marginBottom: '16px' }}>For over three decades, we've set the gold standard for North India's student celebrations. Join thousands in experiencing the pulse.</p>
                     </div>
                 </div>

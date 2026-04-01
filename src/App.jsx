@@ -10,7 +10,7 @@ const About = lazy(() => import('./pages/About'));
 const Events = lazy(() => import('./pages/Events'));
 const Sponsors = lazy(() => import('./pages/Sponsors'));
 const Team = lazy(() => import('./pages/Team'));
-const Register = lazy(() => import('./pages/Register'));
+import Register from './pages/Register';
 import Home from './pages/Home';
 const ForSuman = lazy(() => import('./pages/ForSuman'));
 const ForKalpana = lazy(() => import('./pages/ForKalpana'));

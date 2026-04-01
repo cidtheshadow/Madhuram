@@ -16,7 +16,7 @@ const About = () => {
     }, []);
 
     const timeline = [
-        { title: 'FOUNDING', desc: 'The journey began with a vision to revolutionize technical education in the region.', tag: '1989 ORIGINS', color: 'var(--yellow)', icon: '🏛️' },
+        { title: 'FOUNDING', desc: 'The journey began with a vision to revolutionize social education in the region.', tag: '1989 ORIGINS', color: 'var(--yellow)', icon: '🏛️' },
         { title: 'NAAC A-GRADE', desc: 'Achieved pinnacle accreditation, signifying excellence in academic and cultural infrastructure.', tag: 'QUALITY BENCHMARK', color: 'var(--cyan)', icon: '⭐' },
         { title: '451-ACRE ECO', desc: 'Evolution into a massive self-sustaining green ecosystem fostering innovation and life.', tag: 'SUSTAINABLE GROWTH', color: '#0f0', icon: '🌿' },
         { title: 'NIRF RANK 79', desc: 'Recognized among the elite engineering institutions in the nation for research and impact.', tag: 'NATIONAL MERIT', color: 'var(--pink)', icon: '🏆' }
@@ -46,7 +46,7 @@ const About = () => {
                     <motion.h1 style={{ fontSize: isMobile ? '4rem' : '6rem', WebkitTextStroke: '1px var(--pink)', color: 'transparent', margin: 0, lineHeight: 1, fontFamily: 'var(--font-logo)', x: isMobile ? 0 : 20 }}>MADHURAM</motion.h1>
                     <motion.h1 style={{ fontSize: isMobile ? '5rem' : '7.5rem', color: 'var(--yellow)', margin: 0, lineHeight: 1, textShadow: '0 0 20px rgba(252, 238, 10, 0.3)', fontFamily: 'var(--font-logo)' }}>LEGACY</motion.h1>
                     <p style={{ color: 'var(--text-muted)', fontSize: '1rem', marginTop: '30px', marginBottom: '40px', maxWidth: '450px', marginLeft: isMobile ? 'auto' : '0', marginRight: isMobile ? 'auto' : '0' }}>
-                        Forging inclusive cultural bridges through technical excellence and artistic expression in the heart of Punjab.
+                        Forging inclusive cultural bridges through cultural excellence and artistic expression in the heart of Punjab.
                     </p>
                     <button className="btn-primary" onClick={() => navigate('/events')}>EXPLORE ARCHIVE</button>
                 </div>
@@ -63,7 +63,7 @@ const About = () => {
                 style={{ background: 'rgba(255,255,255,0.03)', padding: isMobile ? '40px 20px' : '80px', borderRadius: '20px', borderLeft: '6px solid var(--pink)', marginBottom: '100px', textAlign: 'center' }}>
                 <div style={{ color: 'var(--cyan)', fontWeight: 900, letterSpacing: '4px', marginBottom: '30px', fontSize: '0.8rem' }}>OUR MISSION</div>
                 <div style={{ fontSize: isMobile ? '1.8rem' : '3.2rem', lineHeight: 1.3, color: '#fff', fontWeight: 900 }}>
-                    "Bridging the gap between <span style={{ color: 'var(--yellow)' }}>technical innovation</span> and human expression through <span style={{ color: 'var(--pink)' }}>inclusive excellence</span>."
+                    "Bridging the gap between <span style={{ color: 'var(--yellow)' }}>social innovation</span> and human expression through <span style={{ color: 'var(--pink)' }}>inclusive excellence</span>."
                 </div>
             </motion.div>
 

@@ -55,7 +55,7 @@ const Team = () => {
         { tag: "02", role: "Patron", name: "PROF. V.K. KUKREJA (Dean SW)", color: "var(--cyan)", desc: "Strategic lead ensuring seamless execution of cross-departmental operations.", img: "/team/2.png", linkedin: "https://www.linkedin.com/in/vijay-kukreja-7a001120/" },
         { tag: "03", role: "Chairman", name: "PROF. INDRAJ  (Prof. ME)", color: "var(--yellow)", desc: "Scaling the logistical networks and core operational engine of the festival.", img: "/team/3.png", linkedin: "https://www.linkedin.com/in/indraj-singh-3b88831a3/" },
         { tag: "04", role: "Vice-Chairman", name: "ER. ANSHUKA BANSAL (AsP EIE)", color: "#00ff88", desc: "Curator of aesthetics and cultural programming dictating the soul of the event.", img: "/team/4.png", linkedin: "https://sliet.ac.in/people/anshuka/" },
-        { tag: "05", role: "Vice-Chairman", name: "DR. MOHD. MAJID (AsP ME)", color: "var(--pink)", desc: "Driving innovation and oversight of specialized technical frameworks.", img: "/team/5.jpeg", linkedin: "#" }
+        { tag: "05", role: "Vice-Chairman", name: "DR. MOHD. MAJID (AsP ME)", color: "var(--pink)", desc: "Driving innovation and oversight of specialized social frameworks.", img: "/team/5.jpeg", linkedin: "#" }
     ];
 
     const coreTeam = [

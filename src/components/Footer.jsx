@@ -52,7 +52,7 @@ const Footer = () => {
                         मधुरम् '26
                     </div>
                     <p style={{ color: 'var(--text-muted)', maxWidth: '450px', lineHeight: 1.8, fontSize: '1rem' }}>
-                        The cultural pulse of SLIET Longowal. A legacy of artistic excellence and technical innovation since 1989.
+                        The cultural pulse of SLIET Longowal. A legacy of artistic excellence and social innovation since 1989.
                     </p>
                     <div style={{ display: 'flex', gap: '16px', marginTop: '30px' }}>
                         <a
