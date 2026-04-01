@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { User, Hash, Briefcase, Info, CreditCard, CheckCircle2, QrCode, ArrowLeft, Zap } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -221,11 +221,11 @@ const RegistrationForm = ({ isSliet, onBack, initialEvent, isMobile }) => {
 const Register = () => {
     const [searchParams] = useSearchParams();
     const eventParam = searchParams.get('event');
-    const [registrationState, setRegistrationState] = useState('none');
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
-    const canvasRef = useRef(null);
-    const containerRef = useRef(null);
-    const mouseRef = useRef({ x: -1000, y: -1000, active: false });
+    const [registrationState, setRegistrationState] = React.useState('none');
+    const [isMobile, setIsMobile] = React.useState(window.innerWidth < 1024);
+    const canvasRef = React.useRef(null);
+    const containerRef = React.useRef(null);
+    const mouseRef = React.useRef({ x: -1000, y: -1000, active: false });
 
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth < 1024);
