@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
 const STYLES = `
-  @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;1,700&display=swap');
-
   body.transition-active { overflow: hidden; background: #000; }
 
   .loading-text-container {
